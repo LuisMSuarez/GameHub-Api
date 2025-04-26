@@ -1,4 +1,4 @@
-﻿namespace GameHubApi
+﻿namespace GameHubApi.Contracts
 {
     public class CollectionResult<T>
     {

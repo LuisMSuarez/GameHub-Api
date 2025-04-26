@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GameHubApi
+namespace GameHubApi.Contracts
 {
     public class Platform
     {
