@@ -1,28 +1,28 @@
-﻿namespace GameHubApi
+﻿using System.Text.Json.Serialization;
+
+namespace GameHubApi
 {
-    /*
-     * export interface Game {
-  id: number;
-  name: string;
-  background_image: string;
-  rating: number;
-  parent_platforms: { platform: Platform} []
-  metacritic: number | null;
-  rating_top: number; // 1, 2, 3, 4, or 5
-}
-     */
     public class Game
     {
-        public int id { get; set; }
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
 
-        public string name { get; set; }
+        [JsonPropertyName("name")]
+        public required string Name { get; set; }
 
-        public string background_image { get; set; }
+        [JsonPropertyName("background_image")]
+        public string? BackgroundIage { get; set; }
 
-        public int rating { get; set; }
+        [JsonPropertyName("rating")]
+        public int Rating { get; set; }
 
-        public int? metacritic { get; set; }
+        [JsonPropertyName("metacritic")]
+        public int? Metacritic { get; set; }
 
-        public int rating_top { get; set; } // 1, 2, 3, 4, or 5
+        [JsonPropertyName("rating_top")]
+        public int RatingTop { get; set; }
+
+        [JsonPropertyName("parent_platforms")]
+        public List<ParentPlatform> ParentPlatforms { get; set; } = new List<ParentPlatform>();
     }
 }
