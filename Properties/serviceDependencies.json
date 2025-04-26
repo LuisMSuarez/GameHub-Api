@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "secrets1": {
+      "type": "secrets",
+      "connectionId": "kv-gamers-hub",
+      "dynamicId": null
+    }
+  }
+}
