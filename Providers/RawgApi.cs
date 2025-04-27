@@ -1,6 +1,7 @@
 ﻿namespace GameHubApi.Providers
 {
     using GameHubApi.Contracts;
+    using System.Text;
     using System.Text.Json;
     public class RawgApi
     {
@@ -14,10 +15,26 @@
             this.apiKey = apiKey;
         }
 
-        public async Task<CollectionResult<Game>> GetGamesAsync(int page = 1, int pageSize = 20)
+        public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)
         {
-            var url = $"{BaseUrl}/games?key={apiKey}&page={page}&page_size={pageSize}";
-            var response = await httpClient.GetAsync(url);
+            var urlBuilder = new StringBuilder($"{BaseUrl}/games?key={apiKey}&page={page}&page_size={pageSize}");
+            if (!string.IsNullOrWhiteSpace(genres))
+            {
+                urlBuilder.Append($"&genres={Uri.EscapeDataString(genres)}");
+            }
+            if (!string.IsNullOrWhiteSpace(parentPlatforms))
+            {
+                urlBuilder.Append($"&parent_platforms={Uri.EscapeDataString(parentPlatforms)}");
+            }
+            if (!string.IsNullOrWhiteSpace(ordering))
+            {
+                urlBuilder.Append($"&ordering={Uri.EscapeDataString(ordering)}");
+            }
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                urlBuilder.Append($"&search={Uri.EscapeDataString(search)}");
+            }
+            var response = await httpClient.GetAsync(urlBuilder.ToString());
 
             response.EnsureSuccessStatusCode();
 

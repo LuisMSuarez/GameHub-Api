@@ -19,13 +19,17 @@ namespace GameHubApi.Controllers
         }
 
         [HttpGet(Name = "games")]
-        public async Task<CollectionResult<Game>> GetGamesAsync([FromQuery] string? genres, [FromQuery] string? parent_platforms, [FromQuery] string? ordering, [FromQuery] string? search)
+        public async Task<CollectionResult<Game>> GetGamesAsync(
+            [FromQuery(Name = "genres")] string? genres,
+            [FromQuery(Name = "parent_platforms")] string? parentPlatforms,
+            [FromQuery(Name = "ordering")] string? ordering,
+            [FromQuery(Name = "search")] string? search)
         {
             this.logger.LogInformation("GetGamesAsync called to fetch games.");
 
             try
             {
-                var result = await gamesService.GetGamesAsync();
+                var result = await gamesService.GetGamesAsync(genres, parentPlatforms, ordering, search);
                 this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.count);
                 return result;
             }
