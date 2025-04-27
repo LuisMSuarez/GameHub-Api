@@ -6,7 +6,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "kv-gamers-hub": "https://kv-gamers-hub.vault.azure.net/"
+        "SERVICE_KEYVAULT": "https://kv-gamers-hub.vault.azure.net/"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5100"
@@ -17,7 +17,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "kv-gamers-hub": "https://kv-gamers-hub.vault.azure.net/"
+        "SERVICE_KEYVAULT": "https://kv-gamers-hub.vault.azure.net/"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7285;http://localhost:5100"
@@ -28,7 +28,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "kv-gamers-hub": "https://kv-gamers-hub.vault.azure.net/"
+        "SERVICE_KEYVAULT": "https://kv-gamers-hub.vault.azure.net/"
       }
     },
     "Container (Dockerfile)": {
@@ -38,7 +38,7 @@
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8081",
         "ASPNETCORE_HTTP_PORTS": "8080",
-        "kv-gamers-hub": "https://kv-gamers-hub.vault.azure.net/"
+        "SERVICE_KEYVAULT": "https://kv-gamers-hub.vault.azure.net/"
       },
       "publishAllPorts": true,
       "useSSL": true

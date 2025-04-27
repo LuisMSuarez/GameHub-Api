@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using GameHubApi.Contracts;
+using GameHubApi.Controllers;
 using GameHubApi.Providers;
 
 namespace GameHubApi.Services
@@ -8,14 +9,17 @@ namespace GameHubApi.Services
     public class GamesService : IGamesService
     {
         private readonly RawgApi gamesProvider;
-        private const string KeyVaultUrl = "https://kv-gamers-hub.vault.azure.net/";
         private const string SecretName = "RawgApiKey";
-        public GamesService()
+        private readonly ILogger<GamesService> logger;
+        public GamesService(ILogger<GamesService> logger, IConfiguration configuration)
         {
-            // Fetch the API key from Azure Key Vault
-            var client = new SecretClient(new Uri(KeyVaultUrl), new DefaultAzureCredential());
-            var secret = client.GetSecret(SecretName);
-            var apiKey = secret.Value.Value;
+            this.logger = logger;
+            var apiKey = configuration[SecretName];
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                this.logger.LogError("API key is not set in the configuration.");
+                throw new InvalidOperationException("API key is not set in the configuration.");
+            }
 
             gamesProvider = new RawgApi(new HttpClient(), apiKey);
         }
