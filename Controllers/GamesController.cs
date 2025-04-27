@@ -1,4 +1,5 @@
 ﻿using GameHubApi.Contracts;
+using GameHubApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,36 +9,31 @@ namespace GameHubApi.Controllers
     [ApiController]
     public class GamesController : ControllerBase
     {
-        [HttpGet(Name = "GetGames")]
-        public CollectionResult<Game> Get()
+        private readonly IGamesService gamesService;
+        private readonly ILogger<GamesController> logger;
+
+        public GamesController(ILogger<GamesController> logger, ILogger<GamesService> gamesServiceLogger, IConfiguration configuration)
         {
-            return new CollectionResult<Game>
+            this.logger = logger;
+            this.gamesService = new GamesService(gamesServiceLogger, configuration);
+        }
+
+        [HttpGet(Name = "GetGames")]
+        public async Task<CollectionResult<Game>> GetGamesAsync()
+        {
+            this.logger.LogInformation("GetGamesAsync called to fetch games.");
+
+            try
             {
-                count = 20,
-                next = "https://localhost",
-                previous = null,
-                results = Enumerable.Range(1, 20).Select(index => new Game
-                {
-                    Id = index,
-                    Name = "Game " + index,
-                    BackgroundIage = "https://media.rawg.io/media/games/618/618c2031a07bbff6b4f611f10b6bcdbc.jpg",
-                    Rating = Random.Shared.Next(1, 6),
-                    Metacritic = Random.Shared.Next(0, 101),
-                    RatingTop = Random.Shared.Next(1, 6),
-                    ParentPlatforms = new List<ParentPlatform>
-                    {
-                        new ParentPlatform
-                        {
-                            Platform = new Platform
-                            {
-                                Id = 1,
-                                Name = "PC",
-                                Slug = "pc"
-                            }
-                        }
-                    }
-                }).ToList<Game>()
-            };
+                var result = await gamesService.GetGamesAsync();
+                this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.count);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching games in GetGamesAsync.");
+                throw; // Re-throw the exception to ensure proper error handling
+            }
         }
     }
 }

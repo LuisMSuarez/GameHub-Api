@@ -1,7 +1,14 @@
 using Azure.Identity;
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("kv-gamers-hub")!);
+var keyVaultVariable = Environment.GetEnvironmentVariable("SERVICE_KEYVAULT");
+if (string.IsNullOrEmpty(keyVaultVariable))
+{
+    throw new InvalidOperationException("Key Vault URL is not set in the environment variables.");
+}
+
+// If you need to access the secret in a service or controller, inject IConfiguration into the class and retrieve the value
+var keyVaultEndpoint = new Uri(keyVaultVariable);
 builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
 // Add services to the container.
@@ -19,7 +26,7 @@ builder.Services.AddCors(options =>
     // cors policy to only allow GET requests from allow-list origins
     options.AddPolicy("SpecificOrigins", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://gamers-hub.azurewebsites.net/") // allowed origins
+        policy.WithOrigins("http://localhost:5173", "https://gamers-hub.azurewebsites.net") // allowed origins
                 .WithMethods("GET") // Only allow GET 
                 .AllowAnyHeader();
     });

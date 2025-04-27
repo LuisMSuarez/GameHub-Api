@@ -14,7 +14,7 @@ namespace GameHubApi.Contracts
         public string? BackgroundIage { get; set; }
 
         [JsonPropertyName("rating")]
-        public int Rating { get; set; }
+        public double Rating { get; set; }
 
         [JsonPropertyName("metacritic")]
         public int? Metacritic { get; set; }
