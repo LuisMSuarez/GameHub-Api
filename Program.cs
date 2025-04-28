@@ -39,9 +39,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
 builder.Services.AddScoped<IRawgApi, RawgApi>();
 
-// Register RawgApi with HttpClient
-builder.Services.AddHttpClient<IRawgApi, RawgApi>().SetHandlerLifetime(TimeSpan.FromMinutes(5));
-
+// Register HttpClient for use by Providers
+builder.Services.AddHttpClient();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
