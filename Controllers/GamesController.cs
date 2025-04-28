@@ -14,8 +14,8 @@ namespace GameHubApi.Controllers
 
         public GamesController(ILogger<GamesController> logger, IGamesService gamesService, IConfiguration configuration)
         {
-            this.logger = logger;
-            this.gamesService = gamesService;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         }
 
         [HttpGet(Name = "games")]

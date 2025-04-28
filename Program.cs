@@ -1,4 +1,5 @@
 using Azure.Identity;
+using GameHubApi.Providers;
 using GameHubApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,11 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
+builder.Services.AddScoped<IRawgApi, RawgApi>();
+
+// Register RawgApi with HttpClient
+builder.Services.AddHttpClient<IRawgApi, RawgApi>().SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
