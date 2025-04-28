@@ -10,16 +10,21 @@
         private const string SecretName = "RawgApiKey";
         private readonly string apiKey;
 
-        public RawgApi(HttpClient httpClient, IConfiguration configuration)
+        public RawgApi(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             if (configuration == null)
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
 
+            if (httpClientFactory == null)
+            {
+                throw new ArgumentNullException(nameof(httpClientFactory));
+            }
+
             var apiKeyValue = configuration[SecretName];
             this.apiKey = apiKeyValue ?? throw new ArgumentNullException(nameof(apiKeyValue));
-            this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            this.httpClient = httpClientFactory.CreateClient();
         }
 
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)
