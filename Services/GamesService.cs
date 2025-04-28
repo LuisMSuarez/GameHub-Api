@@ -23,9 +23,9 @@ namespace GameHubApi.Services
 
             gamesProvider = new RawgApi(new HttpClient(), apiKey);
         }
-        public async Task<CollectionResult<Game>> GetGamesAsync()
+        public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search)
         {
-            return await gamesProvider.GetGamesAsync();
+            return await gamesProvider.GetGamesAsync(genres, parentPlatforms, ordering, search);
         }
     }
 }
