@@ -3,16 +3,23 @@
     using GameHubApi.Contracts;
     using System.Text;
     using System.Text.Json;
-    public class RawgApi
+    public class RawgApi : IRawgApi
     {
         private readonly HttpClient httpClient;
         private const string BaseUrl = "https://api.rawg.io/api";
+        private const string SecretName = "RawgApiKey";
         private readonly string apiKey;
 
-        public RawgApi(HttpClient httpClient, string apiKey)
+        public RawgApi(HttpClient httpClient, IConfiguration configuration)
         {
-            this.httpClient = httpClient;
-            this.apiKey = apiKey;
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            var apiKeyValue = configuration[SecretName];
+            this.apiKey = apiKeyValue ?? throw new ArgumentNullException(nameof(apiKeyValue));
+            this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)

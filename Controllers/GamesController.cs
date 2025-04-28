@@ -12,10 +12,10 @@ namespace GameHubApi.Controllers
         private readonly IGamesService gamesService;
         private readonly ILogger<GamesController> logger;
 
-        public GamesController(ILogger<GamesController> logger, ILogger<GamesService> gamesServiceLogger, IConfiguration configuration)
+        public GamesController(ILogger<GamesController> logger, IGamesService gamesService, IConfiguration configuration)
         {
-            this.logger = logger;
-            this.gamesService = new GamesService(gamesServiceLogger, configuration);
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         }
 
         [HttpGet(Name = "games")]
