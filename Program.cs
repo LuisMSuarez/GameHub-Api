@@ -1,4 +1,5 @@
 using Azure.Identity;
+using GameHubApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultVariable = Environment.GetEnvironmentVariable("SERVICE_KEYVAULT");
@@ -33,8 +34,9 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddScoped<IGamesService, GamesService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
