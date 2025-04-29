@@ -1,7 +1,6 @@
 ﻿namespace GameHubApi.Providers
 {
     using GameHubApi.Contracts;
-    using Microsoft.Extensions.Logging;
     using System.Text;
     using System.Text.Json;
     public class RawgApi : IRawgApi
@@ -13,8 +12,7 @@
 
         public RawgApi(
             IHttpClientFactory httpClientFactory,
-            IConfiguration configuration,
-            ILogger<RawgApi> logger)
+            IConfiguration configuration)
         {
             if (configuration == null)
             {
@@ -24,11 +22,6 @@
             if (httpClientFactory == null)
             {
                 throw new ArgumentNullException(nameof(httpClientFactory));
-            }
-
-            if (logger == null)
-            {
-                throw new ArgumentNullException(nameof(logger));
             }
 
             var apiKeyValue = configuration[SecretName];
