@@ -10,7 +10,9 @@
         private const string SecretName = "RawgApiKey";
         private readonly string apiKey;
 
-        public RawgApi(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public RawgApi(
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             if (configuration == null)
             {
@@ -30,6 +32,7 @@
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)
         {
             var urlBuilder = new StringBuilder($"{BaseUrl}/games?key={apiKey}&page={page}&page_size={pageSize}");
+
             if (!string.IsNullOrWhiteSpace(genres))
             {
                 urlBuilder.Append($"&genres={Uri.EscapeDataString(genres)}");
@@ -46,10 +49,9 @@
             {
                 urlBuilder.Append($"&search={Uri.EscapeDataString(search)}");
             }
+
             var response = await httpClient.GetAsync(urlBuilder.ToString());
-
             response.EnsureSuccessStatusCode();
-
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<CollectionResult<Game>>(content);
 
