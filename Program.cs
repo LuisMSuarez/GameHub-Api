@@ -38,7 +38,6 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
-builder.Services.AddScoped<IRawgApi, CachedRawgApi>();
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
@@ -48,6 +47,9 @@ builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provide
 {
     return new LruCache<string, CollectionResult<Game>>(size: 1000);
 });
+
+// Register CachedRawgApi as default implementation of the interface
+builder.Services.AddScoped<IRawgApi, CachedRawgApi>();
 
 // Register IRawgApi factory to enable creation of instances of RawgApi and CachedRawgApi based on the key provided.
 // This allows for easy switching between different implementations of IRawgApi.

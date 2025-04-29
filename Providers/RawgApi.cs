@@ -34,7 +34,6 @@
             var apiKeyValue = configuration[SecretName];
             this.apiKey = apiKeyValue ?? throw new ArgumentNullException(nameof(apiKeyValue));
             this.httpClient = httpClientFactory.CreateClient();
-            this.logger = logger;
         }
 
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)
@@ -58,10 +57,8 @@
                 urlBuilder.Append($"&search={Uri.EscapeDataString(search)}");
             }
 
-            var requestUri = urlBuilder.ToString();
-
             // fallback to making the request
-            var response = await httpClient.GetAsync(requestUri);
+            var response = await httpClient.GetAsync(urlBuilder.ToString());
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<CollectionResult<Game>>(content);
