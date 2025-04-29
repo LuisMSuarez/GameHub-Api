@@ -50,7 +50,6 @@
                 urlBuilder.Append($"&search={Uri.EscapeDataString(search)}");
             }
 
-            // fallback to making the request
             var response = await httpClient.GetAsync(urlBuilder.ToString());
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
