@@ -1,10 +1,11 @@
 using Azure.Identity;
+using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultVariable = Environment.GetEnvironmentVariable("SERVICE_KEYVAULT");
-if (string.IsNullOrEmpty(keyVaultVariable))
+if (string.IsNullOrWhiteSpace(keyVaultVariable))
 {
     throw new InvalidOperationException("Key Vault URL is not set in the environment variables.");
 }
@@ -41,6 +42,12 @@ builder.Services.AddScoped<IRawgApi, RawgApi>();
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
+
+// Register games cache as a Singleton so it can be reused across requests
+builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provider =>
+{
+    return new LruCache<string, CollectionResult<Game>>(size: 1000);
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
