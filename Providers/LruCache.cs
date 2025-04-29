@@ -57,6 +57,7 @@
                 if (node.Value.expiration == null ||
                     DateTime.UtcNow < node.Value.expiration.Value)
                 {
+                    // cached value exists and still not expired
                     list.Remove(node);
                     list.AddFirst(node);
                     return node.Value.value;
@@ -77,13 +78,11 @@
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            // note: allowing setting null values
 
             if (dict.ContainsKey(key))
             {
+                // setting the conditions same as case where key is not present
                 list.Remove(dict[key]);
                 dict.Remove(key);
             }
