@@ -33,6 +33,9 @@ builder.Services.AddScoped<IGamesService, GamesService>();
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
 
+// Register HttpContextAccessor to enable access to the current HTTP context
+builder.Services.AddHttpContextAccessor();
+
 // Register games cache as a Singleton so it can be reused across requests
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provider =>
 {
