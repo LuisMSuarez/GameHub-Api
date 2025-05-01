@@ -1,7 +1,7 @@
-using GameHubApi.Providers;
-
 namespace GameHubApiTests
 {
+    using GameHubApi.Providers;
+
     public class LruCacheTests
     {
         [Fact]

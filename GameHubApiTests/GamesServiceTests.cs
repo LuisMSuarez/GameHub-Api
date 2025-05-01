@@ -1,11 +1,10 @@
-﻿using GameHubApi.Contracts;
-using GameHubApi.Providers;
-using GameHubApi.Services;
-using Moq;
-using Xunit;
-
-namespace GameHubApiTests
+﻿namespace GameHubApiTests
 {
+    using GameHubApi.Contracts;
+    using GameHubApi.Providers;
+    using GameHubApi.Services;
+    using Moq;
+
     public class GamesServiceTests
     {
         [Fact]
