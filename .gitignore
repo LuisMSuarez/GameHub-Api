@@ -3,3 +3,10 @@
 /obj
 /Properties/PublishProfiles
 /Properties/ServiceDependencies
+/GameHubApi/bin
+/GameHubApi/obj
+/GameHubApiTests/bin
+/GameHubApiTests/obj
+/GameHubApi/Properties/PublishProfiles
+/myapp
+/GameHubApiTests/TestResults

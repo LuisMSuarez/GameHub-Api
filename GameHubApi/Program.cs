@@ -17,15 +17,6 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-    /* cors policy to allow all origins
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-    */
-
     // cors policy to only allow GET requests from allow-list origins
     options.AddPolicy("SpecificOrigins", policy =>
     {
@@ -41,6 +32,9 @@ builder.Services.AddScoped<IGamesService, GamesService>();
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
+
+// Register HttpContextAccessor to enable access to the current HTTP context
+builder.Services.AddHttpContextAccessor();
 
 // Register games cache as a Singleton so it can be reused across requests
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provider =>
@@ -71,7 +65,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-// app.UseCors("AllowAll");
 app.UseCors("SpecificOrigins");
 
 // Configure the HTTP request pipeline.

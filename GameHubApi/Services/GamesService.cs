@@ -1,18 +1,13 @@
-﻿using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using GameHubApi.Contracts;
-using GameHubApi.Controllers;
-using GameHubApi.Providers;
-
-namespace GameHubApi.Services
+﻿namespace GameHubApi.Services
 {
+    using GameHubApi.Contracts;
+    using GameHubApi.Providers;
+
     public class GamesService : IGamesService
     {
         private readonly IRawgApi rawgApi;
-        private readonly ILogger<GamesService> logger;
-        public GamesService(ILogger<GamesService> logger, IRawgApi rawgApi)
+        public GamesService(IRawgApi rawgApi)
         {
-            this.logger =  logger ?? throw new ArgumentNullException(nameof(logger));
             this.rawgApi = rawgApi ?? throw new ArgumentNullException(nameof(rawgApi));
         }
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search)

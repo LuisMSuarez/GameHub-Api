@@ -3,27 +3,32 @@
     using GameHubApi.Contracts;
     using System.Text;
     using System.Text.Json;
+    using System.Web;
+
     public class RawgApi : IRawgApi
     {
         private readonly HttpClient httpClient;
         private const string BaseUrl = "https://api.rawg.io/api";
         private const string SecretName = "RawgApiKey";
         private readonly string apiKey;
+        private readonly IHttpContextAccessor httpContextAccessor; // Add IHttpContextAccessor
 
         public RawgApi(
             IHttpClientFactory httpClientFactory,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
             if (httpClientFactory == null)
             {
                 throw new ArgumentNullException(nameof(httpClientFactory));
             }
 
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             var apiKeyValue = configuration[SecretName];
             this.apiKey = apiKeyValue ?? throw new ArgumentNullException(nameof(apiKeyValue));
             this.httpClient = httpClientFactory.CreateClient();
@@ -54,6 +59,7 @@
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<CollectionResult<Game>>(content);
+            this.UpdatePaginationLinks(result);
 
             if (result == null)
             {
@@ -61,6 +67,44 @@
             }
 
             return result;
+        }
+
+        private void UpdatePaginationLinks(CollectionResult<Game>? results)
+        {
+            if (results == null)
+            {
+                return;
+            }
+
+            if (httpContextAccessor.HttpContext == null)
+            {
+                throw new InvalidOperationException("HttpContext is not available.");
+            }
+
+            // Obtain the hostname from the current HTTP context
+            var uriScheme = httpContextAccessor.HttpContext.Request.Scheme;
+            var uriHostname = httpContextAccessor.HttpContext.Request.Host.Value;
+            var uriPath = httpContextAccessor.HttpContext.Request.Path.Value;
+
+
+            if (results.next != null)
+            {
+                var uri = new Uri(results.next);
+                var query = HttpUtility.ParseQueryString(uri.Query);
+
+                // Rawg API returns the key in the query string, we need to remove it to avoid exposing it
+                query.Remove("key");
+                results.next = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
+            }
+            if (results.previous != null)
+            {
+                var uri = new Uri(results.previous);
+                var query = HttpUtility.ParseQueryString(uri.Query);
+
+                // Rawg API returns the key in the query string, we need to remove it to avoid exposing it
+                query.Remove("key");
+                results.next = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
+            }
         }
     }
 }

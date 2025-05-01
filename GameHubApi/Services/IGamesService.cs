@@ -1,8 +1,6 @@
-﻿using GameHubApi.Contracts;
-using Microsoft.AspNetCore.Mvc;
-
-namespace GameHubApi.Services
+﻿namespace GameHubApi.Services
 {
+    using GameHubApi.Contracts;
     public interface IGamesService
     {
         Task<CollectionResult<Game>> GetGamesAsync (string? genres, string? parentPlatforms, string? ordering, string? search);
