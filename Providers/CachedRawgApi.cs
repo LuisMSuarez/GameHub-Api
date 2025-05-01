@@ -1,8 +1,8 @@
-﻿using GameHubApi.Contracts;
-using System.Text;
-
-namespace GameHubApi.Providers
+﻿namespace GameHubApi.Providers
 {
+    using GameHubApi.Contracts;
+    using System.Text;
+
     public class CachedRawgApi : IRawgApi
     {
         private readonly ILruCache<string, CollectionResult<Game>> gamesCache;

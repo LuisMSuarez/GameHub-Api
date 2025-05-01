@@ -1,10 +1,7 @@
-﻿using GameHubApi.Contracts;
-using GameHubApi.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace GameHubApi.Controllers
+﻿namespace GameHubApi.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+
     [Route("v1/[controller]")]
     [ApiController]
     public class PingController : ControllerBase
