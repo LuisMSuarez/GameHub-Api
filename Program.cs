@@ -17,15 +17,6 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-    /* cors policy to allow all origins
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-    */
-
     // cors policy to only allow GET requests from allow-list origins
     options.AddPolicy("SpecificOrigins", policy =>
     {
@@ -71,7 +62,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-// app.UseCors("AllowAll");
 app.UseCors("SpecificOrigins");
 
 // Configure the HTTP request pipeline.
