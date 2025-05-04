@@ -36,11 +36,11 @@ namespace GameHubApiTests
             };
 
             mockGamesService
-                .Setup(service => service.GetGamesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.GetGamesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(mockResult);
 
             // Act
-            var result = await controller.GetGamesAsync(null, null, null, null);
+            var result = await controller.GetGamesAsync(null, null, null, null, 1, 20);
 
             // Assert
             Assert.NotNull(result);
@@ -54,11 +54,11 @@ namespace GameHubApiTests
         {
             // Arrange
             mockGamesService
-                .Setup(service => service.GetGamesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.GetGamesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ThrowsAsync(new Exception("Service error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => controller.GetGamesAsync(null, null, null, null));
+            await Assert.ThrowsAsync<Exception>(() => controller.GetGamesAsync(null, null, null, null, 1, 20));
         }
     }
 }

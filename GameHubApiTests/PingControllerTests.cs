@@ -26,7 +26,7 @@ namespace GameHubApiTests
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.NotNull(okResult.Value);
-            Assert.True(okResult.Value.ToString().Contains("Request was successful!"));
+            Assert.Contains("Request was successful!", okResult.Value.ToString());
         }
     }
 }

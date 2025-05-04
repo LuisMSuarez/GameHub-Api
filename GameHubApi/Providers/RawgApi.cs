@@ -86,7 +86,6 @@
             var uriHostname = httpContextAccessor.HttpContext.Request.Host.Value;
             var uriPath = httpContextAccessor.HttpContext.Request.Path.Value;
 
-
             if (results.next != null)
             {
                 var uri = new Uri(results.next);
@@ -103,7 +102,7 @@
 
                 // Rawg API returns the key in the query string, we need to remove it to avoid exposing it
                 query.Remove("key");
-                results.next = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
+                results.previous = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
             }
         }
     }
