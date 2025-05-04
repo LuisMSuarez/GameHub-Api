@@ -86,7 +86,6 @@
             var uriHostname = httpContextAccessor.HttpContext.Request.Host.Value;
             var uriPath = httpContextAccessor.HttpContext.Request.Path.Value;
 
-
             if (results.next != null)
             {
                 var uri = new Uri(results.next);
