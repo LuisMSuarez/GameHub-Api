@@ -22,13 +22,16 @@
             [FromQuery(Name = "genres")] string? genres,
             [FromQuery(Name = "parent_platforms")] string? parentPlatforms,
             [FromQuery(Name = "ordering")] string? ordering,
-            [FromQuery(Name = "search")] string? search)
+            [FromQuery(Name = "search")] string? search,
+            [FromQuery(Name = "page")] int page = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 20
+            )
         {
             this.logger.LogInformation("GetGamesAsync called to fetch games.");
 
             try
             {
-                var result = await gamesService.GetGamesAsync(genres, parentPlatforms, ordering, search);
+                var result = await gamesService.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
                 this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.count);
                 return result;
             }

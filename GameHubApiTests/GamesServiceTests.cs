@@ -20,7 +20,7 @@
             var gamesService = new GamesService(mockRawgApi.Object);
 
             // Act
-            var result = await gamesService.GetGamesAsync("action", "pc", "name", "search");
+            var result = await gamesService.GetGamesAsync("action", "pc", "name", "search", 1, 20);
 
             // Assert
             Assert.Equal(expectedResult, result);
@@ -40,7 +40,7 @@
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                gamesService.GetGamesAsync("action", "pc", "name", "search"));
+                gamesService.GetGamesAsync("action", "pc", "name", "search", 1, 20));
         }
     }
 }

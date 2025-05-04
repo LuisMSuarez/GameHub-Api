@@ -10,9 +10,9 @@
         {
             this.rawgApi = rawgApi ?? throw new ArgumentNullException(nameof(rawgApi));
         }
-        public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search)
+        public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
         {
-            return await rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search);
+            return await rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
         }
     }
 }

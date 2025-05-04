@@ -103,7 +103,7 @@
 
                 // Rawg API returns the key in the query string, we need to remove it to avoid exposing it
                 query.Remove("key");
-                results.next = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
+                results.previous = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
             }
         }
     }
