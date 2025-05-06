@@ -23,6 +23,9 @@
         public int RatingTop { get; set; }
 
         [JsonPropertyName("parent_platforms")]
-        public List<ParentPlatform> ParentPlatforms { get; set; } = new List<ParentPlatform>();
+        public IList<ParentPlatform> ParentPlatforms { get; set; } = new List<ParentPlatform>();
+
+        [JsonPropertyName("tags")]
+        public IList<Tag> Tags { get; set; } = new List<Tag>();
     }
 }
