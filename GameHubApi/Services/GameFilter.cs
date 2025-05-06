@@ -6,7 +6,7 @@ namespace GameHubApi.Services
     {
         public FilterResult Filter(Game game)
         {
-            throw new NotImplementedException();
+            return FilterResult.Passed;
         }
     }
 }

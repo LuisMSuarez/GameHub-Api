@@ -29,6 +29,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
+builder.Services.AddScoped<IGameFilter, GameFilter>();
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
