@@ -32,7 +32,7 @@
             try
             {
                 var result = await gamesService.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
-                this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.count);
+                this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.Count);
                 return result;
             }
             catch (Exception ex)

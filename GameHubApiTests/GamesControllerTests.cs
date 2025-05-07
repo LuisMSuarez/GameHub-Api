@@ -27,8 +27,8 @@ namespace GameHubApiTests
             // Arrange
             var mockResult = new CollectionResult<Game>
             {
-                count = 2,
-                results = new List<Game>
+                Count = 2,
+                Results = new List<Game>
                 {
                     new Game { Id = 1, Name = "Game 1", Rating = 4.5 },
                     new Game { Id = 2, Name = "Game 2", Rating = 4.0 }
@@ -44,9 +44,9 @@ namespace GameHubApiTests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.count);
-            Assert.Equal("Game 1", result.results[0].Name);
-            Assert.Equal("Game 2", result.results[1].Name);
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Game 1", result.Results[0].Name);
+            Assert.Equal("Game 2", result.Results[1].Name);
         }
 
         [Fact]

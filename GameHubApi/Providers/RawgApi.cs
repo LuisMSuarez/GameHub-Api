@@ -86,23 +86,23 @@
             var uriHostname = httpContextAccessor.HttpContext.Request.Host.Value;
             var uriPath = httpContextAccessor.HttpContext.Request.Path.Value;
 
-            if (results.next != null)
+            if (results.Next != null)
             {
-                var uri = new Uri(results.next);
+                var uri = new Uri(results.Next);
                 var query = HttpUtility.ParseQueryString(uri.Query);
 
                 // Rawg API returns the key in the query string, we need to remove it to avoid exposing it
                 query.Remove("key");
-                results.next = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
+                results.Next = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
             }
-            if (results.previous != null)
+            if (results.Previous != null)
             {
-                var uri = new Uri(results.previous);
+                var uri = new Uri(results.Previous);
                 var query = HttpUtility.ParseQueryString(uri.Query);
 
                 // Rawg API returns the key in the query string, we need to remove it to avoid exposing it
                 query.Remove("key");
-                results.previous = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
+                results.Previous = $"{uriScheme}://{uriHostname}{uriPath}?{query}";
             }
         }
     }
