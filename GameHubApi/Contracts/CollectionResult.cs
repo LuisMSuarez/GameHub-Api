@@ -1,10 +1,19 @@
-﻿namespace GameHubApi.Contracts
+﻿using System.Text.Json.Serialization;
+
+namespace GameHubApi.Contracts
 {
     public class CollectionResult<T>
     {
-        public int count { get; set; }
-        public string? next { get; set; }
-        public string? previous { get; set; }
-        public List<T> results { get; set; } = new List<T>();
+        [JsonPropertyName("count")]
+        public int Count { get; set; }
+
+        [JsonPropertyName("next")]
+        public string? Next { get; set; }
+
+        [JsonPropertyName("previous")]
+        public string? Previous { get; set; }
+
+        [JsonPropertyName("results")]
+        public List<T> Results { get; set; } = new List<T>();
     }
 }
