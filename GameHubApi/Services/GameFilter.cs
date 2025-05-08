@@ -36,6 +36,12 @@ namespace GameHubApi.Services
                 return FilterResult.Blocked;
             }
 
+            // Check if the game name contains any blocked tags
+            if (blockedTags.Any(tag => game.Name.Contains(tag, StringComparison.OrdinalIgnoreCase)))
+            {
+                return FilterResult.Blocked;
+            }
+
             return FilterResult.Passed;
         }
     }
