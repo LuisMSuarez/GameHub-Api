@@ -1,7 +1,9 @@
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Services;
+using Microsoft.Extensions.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultVariable = Environment.GetEnvironmentVariable("SERVICE_KEYVAULT");
@@ -12,7 +14,14 @@ if (string.IsNullOrWhiteSpace(keyVaultVariable))
 
 // If you need to access the secret in a service or controller, inject IConfiguration into the class and retrieve the value
 var keyVaultEndpoint = new Uri(keyVaultVariable);
-builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+builder.Configuration.AddAzureKeyVault(
+    keyVaultEndpoint,
+    new DefaultAzureCredential(),
+    new AzureKeyVaultConfigurationOptions
+    {
+        ReloadInterval = TimeSpan.FromDays(1) // reload secrets every 15 minutes to avoid restarts/redeployments
+    }
+);
 
 // Add services to the container.
 builder.Services.AddCors(options =>
