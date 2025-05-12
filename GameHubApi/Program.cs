@@ -47,7 +47,7 @@ builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provide
 });
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Genre>>>(provider =>
 {
-    return new LruCache<string, CollectionResult<Genre>>(size: 1);
+    return new LruCache<string, CollectionResult<Genre>>(size: 100);
 });
 
 // Register CachedRawgApi as default implementation of the interface
