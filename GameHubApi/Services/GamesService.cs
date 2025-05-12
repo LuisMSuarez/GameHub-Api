@@ -14,7 +14,7 @@
         }
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
         {
-            var getGamesResult = await rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
+            var getGamesResult = await this.rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
             var filteredGames = getGamesResult.Results.Where(g => this.gameFilter.Filter(g) == FilterResult.Passed);
             return new CollectionResult<Game>
             {

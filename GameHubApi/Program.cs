@@ -29,6 +29,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
+builder.Services.AddScoped<IGenresService, GenresService>();
 
 // Game filter is stateless and thread-safe, so we can register it as a singleton
 builder.Services.AddSingleton<IGameFilter, GameFilter>();
@@ -43,6 +44,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provider =>
 {
     return new LruCache<string, CollectionResult<Game>>(size: 1000);
+});
+builder.Services.AddSingleton<ILruCache<string, CollectionResult<Genre>>>(provider =>
+{
+    return new LruCache<string, CollectionResult<Genre>>(size: 1);
 });
 
 // Register CachedRawgApi as default implementation of the interface
