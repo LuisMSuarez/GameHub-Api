@@ -68,8 +68,25 @@
 
             return result;
         }
+        public async Task<CollectionResult<Genre>> GetGenresAsync(int page = 1, int pageSize = 20)
+        {
+            var urlBuilder = new StringBuilder($"{BaseUrl}/genres?key={apiKey}&page={page}&page_size={pageSize}");
 
-        private void UpdatePaginationLinks(CollectionResult<Game>? results)
+            var response = await httpClient.GetAsync(urlBuilder.ToString());
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<CollectionResult<Genre>>(content);
+            this.UpdatePaginationLinks(result);
+
+            if (result == null)
+            {
+                throw new InvalidOperationException("Failed to deserialize the response content.");
+            }
+
+            return result;
+        }
+
+        private void UpdatePaginationLinks<T>(CollectionResult<T>? results)
         {
             if (results == null)
             {
