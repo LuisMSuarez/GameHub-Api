@@ -56,7 +56,7 @@
             }
 
             // fallback to call base service
-            var results = await this.rawgApi.GetGenresAsync();
+            var results = await this.rawgApi.GetGenresAsync(page, pageSize);
 
             this.genresCache.Set(cacheKey, results, TimeSpan.FromDays(7));
             this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
