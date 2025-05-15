@@ -1,8 +1,10 @@
 namespace GameHubApiTests
 {
+    using Castle.Core.Configuration;
     using GameHubApi.Contracts;
     using GameHubApi.Controllers;
     using GameHubApi.Services;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Moq;
@@ -18,7 +20,7 @@ namespace GameHubApiTests
         {
             mockGamesService = new Mock<IGamesService>();
             mockLogger = new Mock<ILogger<GamesController>>();
-            controller = new GamesController(mockLogger.Object, mockGamesService.Object, Mock.Of<IConfiguration>());
+            controller = new GamesController(mockLogger.Object, mockGamesService.Object);
         }
 
         [Fact]
@@ -40,11 +42,13 @@ namespace GameHubApiTests
                 .ReturnsAsync(mockResult);
 
             // Act
-            var result = await controller.GetGamesAsync(null, null, null, null, 1, 20);
+            var actionResult = await controller.GetGamesAsync(null, null, null, null, 1, 20);
+            var okResult = actionResult as OkObjectResult;
+            Assert.NotNull(okResult);
+            var result = okResult.Value as CollectionResult<Game>;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            Assert.Equal(2, result!.Count);
             Assert.Equal("Game 1", result.Results[0].Name);
             Assert.Equal("Game 2", result.Results[1].Name);
         }

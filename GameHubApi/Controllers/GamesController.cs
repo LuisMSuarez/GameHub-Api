@@ -11,14 +11,14 @@
         private readonly IGamesService gamesService;
         private readonly ILogger<GamesController> logger;
 
-        public GamesController(ILogger<GamesController> logger, IGamesService gamesService, IConfiguration configuration)
+        public GamesController(ILogger<GamesController> logger, IGamesService gamesService)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         }
 
         [HttpGet(Name = "games")]
-        public async Task<CollectionResult<Game>> GetGamesAsync(
+        public async Task<IActionResult> GetGamesAsync(
             [FromQuery(Name = "genres")] string? genres,
             [FromQuery(Name = "parent_platforms")] string? parentPlatforms,
             [FromQuery(Name = "ordering")] string? ordering,
@@ -33,7 +33,12 @@
             {
                 var result = await gamesService.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
                 this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.Count);
-                return result;
+                return Ok(result);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                this.logger.LogWarning(ex, "The requested resource was not found in GetGamesAsync.");
+                return NotFound();
             }
             catch (Exception ex)
             {

@@ -1,10 +1,10 @@
 ﻿namespace GameHubApi.Providers
 {
     using GameHubApi.Contracts;
+    using System.Net;
     using System.Text;
     using System.Text.Json;
     using System.Web;
-
     public class RawgApi : IRawgApi
     {
         private readonly HttpClient httpClient;
@@ -56,6 +56,13 @@
             }
 
             var response = await httpClient.GetAsync(urlBuilder.ToString());
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Handle case where RAWG API returns 404 Not Found
+                // Sometimes, the API returns 404 for valid requests, so we need to handle this gracefully
+                throw new HttpRequestException("The requested resource was not found.", null, HttpStatusCode.NotFound);
+            }
+
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<CollectionResult<Game>>(content);
