@@ -18,7 +18,7 @@
         }
 
         [HttpGet(Name = "games")]
-        public async Task<CollectionResult<Game>> GetGamesAsync(
+        public async Task<IActionResult> GetGamesAsync(
             [FromQuery(Name = "genres")] string? genres,
             [FromQuery(Name = "parent_platforms")] string? parentPlatforms,
             [FromQuery(Name = "ordering")] string? ordering,
@@ -33,7 +33,12 @@
             {
                 var result = await gamesService.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
                 this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.Count);
-                return result;
+                return Ok(result);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                this.logger.LogWarning(ex, "The requested resource was not found in GetGamesAsync.");
+                return NotFound();
             }
             catch (Exception ex)
             {
