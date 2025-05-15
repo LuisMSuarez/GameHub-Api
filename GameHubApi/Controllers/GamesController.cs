@@ -11,7 +11,7 @@
         private readonly IGamesService gamesService;
         private readonly ILogger<GamesController> logger;
 
-        public GamesController(ILogger<GamesController> logger, IGamesService gamesService, IConfiguration configuration)
+        public GamesController(ILogger<GamesController> logger, IGamesService gamesService)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
