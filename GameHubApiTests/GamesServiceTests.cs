@@ -36,8 +36,8 @@
             {
                 Count = 2,
                 Results = new List<Game> {
-                        new Game { Name = "Game 1" },
-                        new Game { Name = "Game 2" }
+                        new Game { Name = "Game 1" , Slug="game1"},
+                        new Game { Name = "Game 2" , Slug="game2"}
                     }
             };
             mockRawgApi

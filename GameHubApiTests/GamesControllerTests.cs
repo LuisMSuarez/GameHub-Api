@@ -32,8 +32,8 @@ namespace GameHubApiTests
                 Count = 2,
                 Results = new List<Game>
                 {
-                    new Game { Id = 1, Name = "Game 1", Rating = 4.5 },
-                    new Game { Id = 2, Name = "Game 2", Rating = 4.0 }
+                    new Game { Id = 1, Name = "Game 1", Slug="game1", Rating = 4.5 },
+                    new Game { Id = 2, Name = "Game 2", Slug="game2", Rating = 4.0 }
                 }
             };
 

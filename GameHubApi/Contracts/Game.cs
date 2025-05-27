@@ -10,6 +10,9 @@
         [JsonPropertyName("name")]
         public required string Name { get; set; }
 
+        [JsonPropertyName("slug")]
+        public required string Slug { get; set; }
+
         [JsonPropertyName("background_image")]
         public string? BackgroundIage { get; set; }
 
