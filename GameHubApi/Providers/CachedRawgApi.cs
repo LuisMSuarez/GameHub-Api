@@ -5,15 +5,23 @@
 
     public class CachedRawgApi : IRawgApi
     {
-        private readonly ILruCache<string, CollectionResult<Game>> gamesCache;
-        private readonly ILruCache<string, CollectionResult<Genre>> genresCache;
+        private readonly ILruCache<string, CollectionResult<Game>> gamesCollectionCache;
+        private readonly ILruCache<string, CollectionResult<Genre>> genresCollectionCache;
+        private readonly ILruCache<string, Game> gameDetailsCache;
         private readonly ILogger<CachedRawgApi> logger;
         private readonly IRawgApi rawgApi;
+        private const string ResourceKey = "resource";
 
-        public CachedRawgApi(ILruCache<string, CollectionResult<Game>> gamesCache, ILruCache<string, CollectionResult<Genre>> genresCache, ILogger<CachedRawgApi> logger, Func<string, IRawgApi> rawgApiFactory)
+        public CachedRawgApi(
+            ILruCache<string, CollectionResult<Game>> gamesCollectionCache,
+            ILruCache<string, CollectionResult<Genre>> genresCollectionCache,
+            ILruCache<string, Game> gameDetailsCache,
+            ILogger<CachedRawgApi> logger, 
+            Func<string, IRawgApi> rawgApiFactory)
         {
-            this.gamesCache = gamesCache ?? throw new ArgumentNullException(nameof(gamesCache));
-            this.genresCache = genresCache ?? throw new ArgumentNullException(nameof(genresCache));
+            this.gamesCollectionCache = gamesCollectionCache ?? throw new ArgumentNullException(nameof(gamesCollectionCache));
+            this.genresCollectionCache = genresCollectionCache ?? throw new ArgumentNullException(nameof(genresCollectionCache));
+            this.gameDetailsCache = gameDetailsCache ?? throw new ArgumentNullException(nameof(gameDetailsCache));
 
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -24,10 +32,39 @@
 
             this.rawgApi = rawgApiFactory("Base") ?? throw new ArgumentNullException(nameof(rawgApiFactory));
         }
+
+        public Task<Game> GetGameAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                throw new ArgumentException("Slug cannot be null or empty.", nameof(slug));
+            }
+
+            var propDictionary = new Dictionary<string, string?>
+            {
+                { ResourceKey, "game" },
+                { "slug", slug }
+            };
+            var cacheKey = BuildCacheKey(propDictionary);
+            var cachedResponse = this.gamesCollectionCache.Get(cacheKey);
+            throw new NotImplementedException();
+        }
+
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)
         {
-            var cacheKey = BuildCacheKey("games", genres, parentPlatforms, ordering, search, page, pageSize);
-            var cachedResponse = this.gamesCache.Get(cacheKey);
+           var propDictionary = new Dictionary<string, string?>
+           {
+               { ResourceKey, "games" },
+               { "genres", genres },
+               { "parentPlatforms", parentPlatforms },
+               { "ordering", ordering },
+               { "search", search },
+               { "page", page.ToString() },
+               { "pageSize", pageSize.ToString() }
+           };
+
+            var cacheKey = BuildCacheKey(propDictionary);
+            var cachedResponse = this.gamesCollectionCache.Get(cacheKey);
 
             if (cachedResponse != null)
             {
@@ -35,10 +72,10 @@
                 return cachedResponse;
             }
 
-            // fallback to call base service
+            // fallback to call base service  
             var results = await this.rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
 
-            this.gamesCache.Set(cacheKey, results, TimeSpan.FromDays(7));
+            this.gamesCollectionCache.Set(cacheKey, results, TimeSpan.FromDays(7));
             this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
 
             return results;
@@ -46,8 +83,14 @@
 
         public async Task<CollectionResult<Genre>> GetGenresAsync(int page = 1, int pageSize = 20)
         {
-            var cacheKey = BuildCacheKey("genres", null, null, null, null, page, pageSize);
-            var cachedResponse = this.genresCache.Get(cacheKey);
+            var propDictionary = new Dictionary<string, string?>
+            {
+                { ResourceKey, "genres" },
+                { "page", page.ToString() },
+                { "pageSize", pageSize.ToString() }
+            };
+            var cacheKey = BuildCacheKey(propDictionary);
+            var cachedResponse = this.genresCollectionCache.Get(cacheKey);
 
             if (cachedResponse != null)
             {
@@ -58,31 +101,26 @@
             // fallback to call base service
             var results = await this.rawgApi.GetGenresAsync(page, pageSize);
 
-            this.genresCache.Set(cacheKey, results, TimeSpan.FromDays(7));
+            this.genresCollectionCache.Set(cacheKey, results, TimeSpan.FromDays(7));
             this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
 
             return results;
         }
 
-        private string BuildCacheKey(string resourceCollection, string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
+        private static string BuildCacheKey(Dictionary<string, string?> parameters)
         {
-            var cacheKeyBuilder = new StringBuilder($"{resourceCollection}?page={page}&page_size={pageSize}");
+            var cacheKeyBuilder = new StringBuilder();
+            if (!parameters.ContainsKey(ResourceKey))
+            {
+                throw new ArgumentException("Cache key must contain name of resource collection");
+            }
 
-            if (!string.IsNullOrWhiteSpace(genres))
+            foreach (var parameter in parameters)
             {
-                cacheKeyBuilder.Append($"&genres={Uri.EscapeDataString(genres)}");
-            }
-            if (!string.IsNullOrWhiteSpace(parentPlatforms))
-            {
-                cacheKeyBuilder.Append($"&parent_platforms={Uri.EscapeDataString(parentPlatforms)}");
-            }
-            if (!string.IsNullOrWhiteSpace(ordering))
-            {
-                cacheKeyBuilder.Append($"&ordering={Uri.EscapeDataString(ordering)}");
-            }
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                cacheKeyBuilder.Append($"&search={Uri.EscapeDataString(search)}");
+                if (!string.IsNullOrWhiteSpace(parameter.Value))
+                {
+                    cacheKeyBuilder.Append($"&{parameter.Key}={Uri.EscapeDataString(parameter.Value)}");
+                }
             }
 
             return cacheKeyBuilder.ToString();
