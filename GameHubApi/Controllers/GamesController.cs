@@ -47,7 +47,6 @@
             }
         }
 
-        // get game by slug
         [HttpGet("{slug}", Name = "game")]
         public async Task<IActionResult> GetGameAsync(string slug)
         {
@@ -72,6 +71,11 @@
             {
                 this.logger.LogWarning(ex, "The requested game was not found in GetGameAsync for slug: {Slug}", slug);
                 return NotFound();
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for slug: {Slug}", slug);
+                return Forbid();
             }
             catch (Exception ex)
             {

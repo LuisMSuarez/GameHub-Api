@@ -10,7 +10,6 @@
         private readonly ILruCache<string, Game> gameDetailsCache;
         private readonly ILogger<CachedRawgApi> logger;
         private readonly IRawgApi rawgApi;
-        private const string ResourceKey = "resource";
 
         public CachedRawgApi(
             ILruCache<string, CollectionResult<Game>> gamesCollectionCache,
@@ -37,7 +36,6 @@
         {
            var propDictionary = new Dictionary<string, string?>
            {
-               { ResourceKey, "games" },
                { "genres", genres },
                { "parentPlatforms", parentPlatforms },
                { "ordering", ordering },
@@ -68,7 +66,6 @@
         {
             var propDictionary = new Dictionary<string, string?>
             {
-                { ResourceKey, "genres" },
                 { "page", page.ToString() },
                 { "pageSize", pageSize.ToString() }
             };
@@ -99,7 +96,6 @@
 
             var propDictionary = new Dictionary<string, string?>
             {
-                { ResourceKey, "game" },
                 { "slug", slug }
             };
             var cacheKey = BuildCacheKey(propDictionary);
@@ -118,17 +114,11 @@
             this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
 
             return results;
-
         }
 
         private static string BuildCacheKey(Dictionary<string, string?> parameters)
         {
             var cacheKeyBuilder = new StringBuilder();
-            if (!parameters.ContainsKey(ResourceKey))
-            {
-                throw new ArgumentException("Cache key must contain name of resource collection");
-            }
-
             foreach (var parameter in parameters)
             {
                 if (!string.IsNullOrWhiteSpace(parameter.Value))
