@@ -46,5 +46,42 @@
                 throw; // Re-throw the exception to ensure proper error handling
             }
         }
+
+        [HttpGet("{slug}", Name = "game")]
+        public async Task<IActionResult> GetGameAsync(string slug)
+        {
+            this.logger.LogInformation("GetGameAsync called for slug: {Slug}", slug);
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                this.logger.LogWarning("GetGameAsync called with an empty or null slug.");
+                return BadRequest("Slug cannot be null or empty.");
+            }
+            try
+            {
+                var game = await gamesService.GetGameAsync(slug);
+                if (game == null)
+                {
+                    this.logger.LogWarning("Game with slug {Slug} not found.", slug);
+                    return NotFound();
+                }
+                this.logger.LogInformation("GetGameAsync successfully fetched game with slug: {Slug}", slug);
+                return Ok(game);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                this.logger.LogWarning(ex, "The requested game was not found in GetGameAsync for slug: {Slug}", slug);
+                return NotFound();
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for slug: {Slug}", slug);
+                return Forbid();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching the game in GetGameAsync for slug: {Slug}", slug);
+                throw; // Re-throw the exception to ensure proper error handling
+            }
+        }
     }
 }

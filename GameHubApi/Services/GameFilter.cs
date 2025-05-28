@@ -42,6 +42,13 @@ namespace GameHubApi.Services
                 return FilterResult.Blocked;
             }
 
+            // Check if the description contains any blocked tags
+            if (!string.IsNullOrWhiteSpace(game.Description) &&
+                blockedTags.Any(tag => game.Description.Contains(tag, StringComparison.OrdinalIgnoreCase)))
+            {
+                return FilterResult.Blocked;
+            }
+
             return FilterResult.Passed;
         }
     }

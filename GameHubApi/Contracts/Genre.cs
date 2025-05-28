@@ -14,6 +14,6 @@ namespace GameHubApi.Contracts
         public required string Slug { get; set; }
 
         [JsonPropertyName("image_background")]
-        public string? BackgroundIage { get; set; }
+        public string? BackgroundImage { get; set; }
     }
 }

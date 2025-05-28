@@ -14,7 +14,7 @@
         public required string Slug { get; set; }
 
         [JsonPropertyName("background_image")]
-        public string? BackgroundIage { get; set; }
+        public string? BackgroundImage { get; set; }
 
         [JsonPropertyName("rating")]
         public double Rating { get; set; }
@@ -30,5 +30,8 @@
 
         [JsonPropertyName("tags")]
         public IList<Tag> Tags { get; set; } = new List<Tag>();
+
+        [JsonPropertyName("description_raw")]
+        public string? Description { get; set; }
     }
 }

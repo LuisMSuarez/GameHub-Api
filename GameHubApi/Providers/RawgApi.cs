@@ -1,6 +1,7 @@
 ﻿namespace GameHubApi.Providers
 {
     using GameHubApi.Contracts;
+    using System;
     using System.Net;
     using System.Text;
     using System.Text.Json;
@@ -54,42 +55,43 @@
             {
                 urlBuilder.Append($"&search={Uri.EscapeDataString(search)}");
             }
-
-            var response = await httpClient.GetAsync(urlBuilder.ToString());
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                // Handle case where RAWG API returns 404 Not Found
-                // Sometimes, the API returns 404 for valid requests, so we need to handle this gracefully
-                throw new HttpRequestException("The requested resource was not found.", null, HttpStatusCode.NotFound);
-            }
-
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<CollectionResult<Game>>(content);
+            var result = await GetAsync<CollectionResult<Game>>(urlBuilder.ToString());
             this.UpdatePaginationLinks(result);
-
-            if (result == null)
-            {
-                throw new InvalidOperationException("Failed to deserialize the response content.");
-            }
-
             return result;
         }
         public async Task<CollectionResult<Genre>> GetGenresAsync(int page = 1, int pageSize = 20)
         {
-            var urlBuilder = new StringBuilder($"{BaseUrl}/genres?key={apiKey}&page={page}&page_size={pageSize}");
+            var url = $"{BaseUrl}/genres?key={apiKey}&page={page}&page_size={pageSize}";
+            var result = await GetAsync<CollectionResult<Genre>>(url);
+            this.UpdatePaginationLinks(result);
+            return result;
+        }
 
-            var response = await httpClient.GetAsync(urlBuilder.ToString());
+        public Task<Game> GetGameAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                throw new ArgumentException("Slug cannot be null or empty.", nameof(slug));
+            }
+            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(slug)}?key={apiKey}";
+            return GetAsync<Game>(url);
+        }
+
+        private async Task<T> GetAsync<T>(string url)
+        {
+            var response = await httpClient.GetAsync(url);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Handle case where RAWG API returns 404 Not Found
+                throw new HttpRequestException("The requested resource was not found.", null, HttpStatusCode.NotFound);
+            }
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<CollectionResult<Genre>>(content);
-            this.UpdatePaginationLinks(result);
-
+            var result = JsonSerializer.Deserialize<T>(content);
             if (result == null)
             {
                 throw new InvalidOperationException("Failed to deserialize the response content.");
             }
-
             return result;
         }
 
