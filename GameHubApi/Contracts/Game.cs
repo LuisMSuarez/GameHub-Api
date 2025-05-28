@@ -32,6 +32,6 @@
         public IList<Tag> Tags { get; set; } = new List<Tag>();
 
         [JsonPropertyName("description_raw")]
-        public string? Description;
+        public string? Description { get; set; }
     }
 }

@@ -33,23 +33,6 @@
             this.rawgApi = rawgApiFactory("Base") ?? throw new ArgumentNullException(nameof(rawgApiFactory));
         }
 
-        public Task<Game> GetGameAsync(string slug)
-        {
-            if (string.IsNullOrWhiteSpace(slug))
-            {
-                throw new ArgumentException("Slug cannot be null or empty.", nameof(slug));
-            }
-
-            var propDictionary = new Dictionary<string, string?>
-            {
-                { ResourceKey, "game" },
-                { "slug", slug }
-            };
-            var cacheKey = BuildCacheKey(propDictionary);
-            var cachedResponse = this.gamesCollectionCache.Get(cacheKey);
-            throw new NotImplementedException();
-        }
-
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page = 1, int pageSize = 20)
         {
            var propDictionary = new Dictionary<string, string?>
@@ -107,6 +90,37 @@
             return results;
         }
 
+        public async Task<Game> GetGameAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                throw new ArgumentException("Slug cannot be null or empty.", nameof(slug));
+            }
+
+            var propDictionary = new Dictionary<string, string?>
+            {
+                { ResourceKey, "game" },
+                { "slug", slug }
+            };
+            var cacheKey = BuildCacheKey(propDictionary);
+            var cachedResponse = this.gameDetailsCache.Get(cacheKey);
+
+            if (cachedResponse != null)
+            {
+                this.logger.LogInformation($"Cache hit for request URI: {cacheKey}");
+                return cachedResponse;
+            }
+
+            // fallback to call base service
+            var results = await this.rawgApi.GetGameAsync(slug);
+
+            this.gameDetailsCache.Set(cacheKey, results, TimeSpan.FromDays(7));
+            this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
+
+            return results;
+
+        }
+
         private static string BuildCacheKey(Dictionary<string, string?> parameters)
         {
             var cacheKeyBuilder = new StringBuilder();
@@ -119,7 +133,7 @@
             {
                 if (!string.IsNullOrWhiteSpace(parameter.Value))
                 {
-                    cacheKeyBuilder.Append($"&{parameter.Key}={Uri.EscapeDataString(parameter.Value)}");
+                    cacheKeyBuilder.Append($"{parameter.Key}={Uri.EscapeDataString(parameter.Value)};");
                 }
             }
 
