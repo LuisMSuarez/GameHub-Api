@@ -1,8 +1,8 @@
 ﻿namespace GameHubApi.Controllers
 {
-    using GameHubApi.Contracts;
     using GameHubApi.Services;
     using Microsoft.AspNetCore.Mvc;
+    using System.Net;
 
     [Route("v1/[controller]")]
     [ApiController]
@@ -35,7 +35,7 @@
                 this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.Count);
                 return Ok(result);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 this.logger.LogWarning(ex, "The requested resource was not found in GetGamesAsync.");
                 return NotFound();
@@ -67,15 +67,16 @@
                 this.logger.LogInformation("GetGameAsync successfully fetched game with slug: {Slug}", slug);
                 return Ok(game);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 this.logger.LogWarning(ex, "The requested game was not found in GetGameAsync for slug: {Slug}", slug);
                 return NotFound();
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
             {
                 this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for slug: {Slug}", slug);
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden);
+
             }
             catch (Exception ex)
             {
