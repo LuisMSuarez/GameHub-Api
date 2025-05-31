@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class Genre
+    public class Publisher
     {
         [JsonPropertyName("id")]
         public int Id { get; set; }

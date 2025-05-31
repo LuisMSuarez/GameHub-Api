@@ -33,5 +33,11 @@
 
         [JsonPropertyName("description_raw")]
         public string? Description { get; set; }
+
+        [JsonPropertyName("genres")]
+        public IList<Genre> Genres { get; set; } = new List<Genre>();
+
+        [JsonPropertyName("publishers")]
+        public IList<Publisher> Publishers { get; set; } = new List<Publisher>();
     }
 }
