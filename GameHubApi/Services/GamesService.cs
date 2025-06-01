@@ -27,14 +27,14 @@
             };
         }
 
-        public async Task<Game> GetGameAsync(string slug)
+        public async Task<Game> GetGameAsync(string id)
         {
-            if (string.IsNullOrWhiteSpace(slug))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                throw new ArgumentException("Slug cannot be null or empty.", nameof(slug));
+                throw new ArgumentException("Id cannot be null or empty.", nameof(id));
             }
 
-            var game = await this.rawgApi.GetGameAsync(slug);
+            var game = await this.rawgApi.GetGameAsync(id);
             if (game != null)
             {
                 if (this.gameFilter.Filter(game) == FilterResult.Passed)
@@ -48,7 +48,11 @@
             }
 
             throw new HttpRequestException("Game not found.", null, HttpStatusCode.NotFound);
+        }
 
+        public async Task<CollectionResult<Movie>> GetMovies(string id)
+        {
+            return await this.rawgApi.GetMovies(id);
         }
     }
 }

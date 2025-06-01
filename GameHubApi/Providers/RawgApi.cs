@@ -67,14 +67,26 @@
             return result;
         }
 
-        public Task<Game> GetGameAsync(string slug)
+        public Task<Game> GetGameAsync(string id)
         {
-            if (string.IsNullOrWhiteSpace(slug))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                throw new ArgumentException("Slug cannot be null or empty.", nameof(slug));
+                throw new ArgumentException("Id cannot be null or empty.", nameof(id));
             }
-            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(slug)}?key={apiKey}";
+            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(id)}?key={apiKey}";
             return GetAsync<Game>(url);
+        }
+
+        public async Task<CollectionResult<Movie>> GetMovies(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new ArgumentException("Id cannot be null or empty.", nameof(id));
+            }
+            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(id)}/movies?key={apiKey}";
+            var result = await GetAsync<CollectionResult<Movie>>(url);
+            this.UpdatePaginationLinks(result);
+            return result;
         }
 
         private async Task<T> GetAsync<T>(string url)
