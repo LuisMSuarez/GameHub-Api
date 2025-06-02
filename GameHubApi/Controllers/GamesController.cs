@@ -1,7 +1,9 @@
 ﻿namespace GameHubApi.Controllers
 {
+    using GameHubApi.Contracts;
     using GameHubApi.Services;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
     using System.Net;
 
     [Route("v1/[controller]")]
@@ -17,7 +19,7 @@
             this.gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         }
 
-        [HttpGet(Name = "games")]
+        [HttpGet(Name = "GetGames")]
         public async Task<IActionResult> GetGamesAsync(
             [FromQuery(Name = "genres")] string? genres,
             [FromQuery(Name = "parent_platforms")] string? parentPlatforms,
@@ -47,40 +49,68 @@
             }
         }
 
-        [HttpGet("{slug}", Name = "game")]
-        public async Task<IActionResult> GetGameAsync(string slug)
+        [HttpGet("{id}", Name = "GetGameDetails")]
+        public async Task<IActionResult> GetGameDetailsAsync(string id)
         {
-            this.logger.LogInformation("GetGameAsync called for slug: {Slug}", slug);
-            if (string.IsNullOrWhiteSpace(slug))
+            this.logger.LogInformation("GetGameAsync called for id: {id}", id);
+            if (string.IsNullOrWhiteSpace(id))
             {
-                this.logger.LogWarning("GetGameAsync called with an empty or null slug.");
-                return BadRequest("Slug cannot be null or empty.");
+                this.logger.LogWarning("GetGameAsync called with an empty or null id.");
+                return BadRequest("Id cannot be null or empty.");
             }
             try
             {
-                var game = await gamesService.GetGameAsync(slug);
+                var game = await gamesService.GetGameAsync(id);
                 if (game == null)
                 {
-                    this.logger.LogWarning("Game with slug {Slug} not found.", slug);
+                    this.logger.LogWarning("Game with id {Id} not found.", id);
                     return NotFound();
                 }
-                this.logger.LogInformation("GetGameAsync successfully fetched game with slug: {Slug}", slug);
+                this.logger.LogInformation("GetGameAsync successfully fetched game with id: {Id}", id);
                 return Ok(game);
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                this.logger.LogWarning(ex, "The requested game was not found in GetGameAsync for slug: {Slug}", slug);
+                this.logger.LogWarning(ex, "The requested game was not found in GetGameAsync for id: {Id}", id);
                 return NotFound();
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
             {
-                this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for slug: {Slug}", slug);
+                this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for id {Id}", id);
                 return StatusCode(StatusCodes.Status403Forbidden);
 
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "An error occurred while fetching the game in GetGameAsync for slug: {Slug}", slug);
+                this.logger.LogError(ex, "An error occurred while fetching the game in GetGameAsync for id: {Id}", id);
+                throw; // Re-throw the exception to ensure proper error handling
+            }
+        }
+
+        [HttpGet("{id}/movies", Name = "GetGameMovies")]
+        public async Task<IActionResult> GetGameMoviesAsync(string id)
+        {
+            this.logger.LogInformation("GetGameMoviesAsync called for id: {id}", id);
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                this.logger.LogWarning("GetGameMoviesAsync called with an empty or null id.");
+                return BadRequest("Id cannot be null or empty.");
+            }
+
+            try
+            {
+                var result = await gamesService.GetMovies(id);
+                this.logger.LogInformation("GetGameMoviesAsync successfully fetched {Count} movies.", result.Count);
+                return Ok(result);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                this.logger.LogWarning(ex, "The requested resource was not found in GetGameMoviesAsync.");
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching movies in GetGameMoviesAsync.");
                 throw; // Re-throw the exception to ensure proper error handling
             }
         }
