@@ -9,6 +9,7 @@
         private readonly ILruCache<string, CollectionResult<Genre>> genresCollectionCache;
         private readonly ILruCache<string, Game> gameDetailsCache;
         private readonly ILruCache<string, CollectionResult<Movie>> movieCollectionCache;
+        private readonly ILruCache<string, CollectionResult<Screenshot>> screenshotCollectionCache;
         private readonly ILogger<CachedRawgApi> logger;
         private readonly IRawgApi rawgApi;
 
@@ -17,6 +18,7 @@
             ILruCache<string, CollectionResult<Genre>> genresCollectionCache,
             ILruCache<string, Game> gameDetailsCache,
             ILruCache<string, CollectionResult<Movie>> movieCollectionCache,
+            ILruCache<string, CollectionResult<Screenshot>> screenshotCollectionCache,
             ILogger<CachedRawgApi> logger, 
             Func<string, IRawgApi> rawgApiFactory)
         {
@@ -24,6 +26,7 @@
             this.genresCollectionCache = genresCollectionCache ?? throw new ArgumentNullException(nameof(genresCollectionCache));
             this.gameDetailsCache = gameDetailsCache ?? throw new ArgumentNullException(nameof(gameDetailsCache));
             this.movieCollectionCache = movieCollectionCache ?? throw new ArgumentNullException(nameof(movieCollectionCache));
+            this.screenshotCollectionCache = screenshotCollectionCache ?? throw new ArgumentNullException(nameof(screenshotCollectionCache));
 
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -90,16 +93,16 @@
             return results;
         }
 
-        public async Task<Game> GetGameAsync(string id)
+        public async Task<Game> GetGameAsync(string gameId)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(gameId))
             {
-                throw new ArgumentException("Id cannot be null or empty.", nameof(id));
+                throw new ArgumentException("Id cannot be null or empty.", nameof(gameId));
             }
 
             var propDictionary = new Dictionary<string, string?>
             {
-                { "id", id }
+                { "id", gameId }
             };
             var cacheKey = BuildCacheKey(propDictionary);
             var cachedResponse = this.gameDetailsCache.Get(cacheKey);
@@ -111,7 +114,7 @@
             }
 
             // fallback to call base service
-            var results = await this.rawgApi.GetGameAsync(id);
+            var results = await this.rawgApi.GetGameAsync(gameId);
 
             this.gameDetailsCache.Set(cacheKey, results, TimeSpan.FromDays(7));
             this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
@@ -119,16 +122,16 @@
             return results;
         }
 
-        public async Task<CollectionResult<Movie>> GetMovies(string id)
+        public async Task<CollectionResult<Movie>> GetMovies(string gameId)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(gameId))
             {
-                throw new ArgumentException("Id cannot be null or empty.", nameof(id));
+                throw new ArgumentException("Id cannot be null or empty.", nameof(gameId));
             }
 
             var propDictionary = new Dictionary<string, string?>
             {
-                { "id", id }
+                { "id", gameId }
             };
             var cacheKey = BuildCacheKey(propDictionary);
             var cachedResponse = this.movieCollectionCache.Get(cacheKey);
@@ -140,9 +143,38 @@
             }
 
             // fallback to call base service
-            var results = await this.rawgApi.GetMovies(id);
+            var results = await this.rawgApi.GetMovies(gameId);
 
             this.movieCollectionCache.Set(cacheKey, results, TimeSpan.FromDays(7));
+            this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
+
+            return results;
+        }
+
+        public async Task<CollectionResult<Screenshot>> GetScreenshots(string gameId)
+        {
+            if (string.IsNullOrWhiteSpace(gameId))
+            {
+                throw new ArgumentException("Id cannot be null or empty.", nameof(gameId));
+            }
+
+            var propDictionary = new Dictionary<string, string?>
+            {
+                { "id", gameId }
+            };
+            var cacheKey = BuildCacheKey(propDictionary);
+            var cachedResponse = this.screenshotCollectionCache.Get(cacheKey);
+
+            if (cachedResponse != null)
+            {
+                this.logger.LogInformation($"Cache hit for request URI: {cacheKey}");
+                return cachedResponse;
+            }
+
+            // fallback to call base service
+            var results = await this.rawgApi.GetScreenshots(gameId);
+
+            this.screenshotCollectionCache.Set(cacheKey, results, TimeSpan.FromDays(7));
             this.logger.LogInformation($"Cache miss for request URI: {cacheKey}");
 
             return results;

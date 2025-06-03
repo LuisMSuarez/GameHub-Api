@@ -5,7 +5,7 @@
     public class Publisher
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public required int Id { get; set; }
 
         [JsonPropertyName("name")]
         public required string Name { get; set; }
