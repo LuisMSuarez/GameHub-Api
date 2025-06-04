@@ -138,7 +138,7 @@
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "An error occurred while fetching movies in GetGameScreenshotsAsync.");
+                this.logger.LogError(ex, "An error occurred while fetching scfreenshots in GetGameScreenshotsAsync.");
                 throw; // Re-throw the exception to ensure proper error handling
             }
         }

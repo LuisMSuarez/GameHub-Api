@@ -1,7 +1,6 @@
-﻿using System.Text.Json.Serialization;
-
-namespace GameHubApi.Contracts
+﻿namespace GameHubApi.Contracts
 {
+    using System.Text.Json.Serialization;
     public class Screenshot
     {
         [JsonPropertyName("id")]
