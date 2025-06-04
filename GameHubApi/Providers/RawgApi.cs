@@ -77,14 +77,25 @@
             return GetAsync<Game>(url);
         }
 
-        public async Task<CollectionResult<Movie>> GetMovies(string id)
+        public async Task<CollectionResult<Movie>> GetMovies(string gameId)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(gameId))
             {
-                throw new ArgumentException("Id cannot be null or empty.", nameof(id));
+                throw new ArgumentException("Id cannot be null or empty.", nameof(gameId));
             }
-            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(id)}/movies?key={apiKey}";
+            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(gameId)}/movies?key={apiKey}";
             var result = await GetAsync<CollectionResult<Movie>>(url);
+            this.UpdatePaginationLinks(result);
+            return result;
+        }
+        public async Task<CollectionResult<Screenshot>> GetScreenshots(string gameId)
+        {
+            if (string.IsNullOrWhiteSpace(gameId))
+            {
+                throw new ArgumentException("Id cannot be null or empty.", nameof(gameId));
+            }
+            var url = $"{BaseUrl}/games/{Uri.EscapeDataString(gameId)}/screenshots?key={apiKey}";
+            var result = await GetAsync<CollectionResult<Screenshot>>(url);
             this.UpdatePaginationLinks(result);
             return result;
         }

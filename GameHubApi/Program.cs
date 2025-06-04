@@ -43,7 +43,7 @@ builder.Services.AddHttpContextAccessor();
 // Register games cache as a Singleton so it can be reused across requests
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Game>>>(provider =>
 {
-    return new LruCache<string, CollectionResult<Game>>(size: 1000);
+    return new LruCache<string, CollectionResult<Game>>(size: 500);
 });
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Genre>>>(provider =>
 {
@@ -56,6 +56,10 @@ builder.Services.AddSingleton<ILruCache<string, Game>>(provider =>
 builder.Services.AddSingleton<ILruCache<string, CollectionResult<Movie>>>(provider =>
 {
     return new LruCache<string, CollectionResult<Movie>>(size: 100);
+});
+builder.Services.AddSingleton<ILruCache<string, CollectionResult<Screenshot>>>(provider =>
+{
+    return new LruCache<string, CollectionResult<Screenshot>>(size: 100);
 });
 
 // Register CachedRawgApi as default implementation of the interface

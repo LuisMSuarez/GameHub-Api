@@ -114,5 +114,33 @@
                 throw; // Re-throw the exception to ensure proper error handling
             }
         }
+
+        [HttpGet("{id}/screenshots", Name = "GetGameScreenshots")]
+        public async Task<IActionResult> GetGameScreenshotsAsync(string id)
+        {
+            this.logger.LogInformation("GetGameScreenshotsAsync called for id: {id}", id);
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                this.logger.LogWarning("GetGameScreenshotsAsync called with an empty or null id.");
+                return BadRequest("Id cannot be null or empty.");
+            }
+
+            try
+            {
+                var result = await gamesService.GetScreenshots(id);
+                this.logger.LogInformation("GetGameScreenshotsAsync successfully fetched {Count} movies.", result.Count);
+                return Ok(result);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                this.logger.LogWarning(ex, "The requested resource was not found in GetGameScreenshotsAsync.");
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching scfreenshots in GetGameScreenshotsAsync.");
+                throw; // Re-throw the exception to ensure proper error handling
+            }
+        }
     }
 }
