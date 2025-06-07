@@ -12,7 +12,7 @@
         private const string BaseUrl = "https://api.rawg.io/api";
         private const string SecretName = "RawgApiKey";
         private readonly string apiKey;
-        private readonly IHttpContextAccessor httpContextAccessor; // Add IHttpContextAccessor
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public RawgApi(
             IHttpClientFactory httpClientFactory,
