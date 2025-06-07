@@ -50,7 +50,7 @@
         }
 
         [HttpGet("{id}", Name = "GetGameDetails")]
-        public async Task<IActionResult> GetGameDetailsAsync(string id)
+        public async Task<IActionResult> GetGameDetailsAsync(string id, [FromQuery] string? language)
         {
             this.logger.LogInformation("GetGameAsync called for id: {id}", id);
             if (string.IsNullOrWhiteSpace(id))
