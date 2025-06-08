@@ -2,6 +2,6 @@
 {
     public interface ITranslator
     {
-        Task<string> Translate(string text, string from, string to);
+        Task<string> Translate(string text, string? from, string to);
     }
 }

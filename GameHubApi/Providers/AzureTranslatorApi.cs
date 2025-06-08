@@ -9,7 +9,7 @@ namespace GameHubApi.Providers
         private readonly HttpClient httpClient;
         private const string BaseUrl = "https://api.cognitive.microsofttranslator.com";
         private const string ApiKeySecretName = "AzureTranslatorApiKey";
-        private const string ApiLocationSecretName = "AzureTranslatorApiKey";
+        private const string ApiLocationSecretName = "AzureTranslatorApiLocation";
         private readonly string location;
         private readonly string apiKey;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -37,16 +37,11 @@ namespace GameHubApi.Providers
             this.httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<string> Translate(string text, string from, string to)
+        public async Task<string> Translate(string text, string? from, string to)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
                 throw new ArgumentNullException(nameof(text), "Text to translate cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(from))
-            {
-                throw new ArgumentNullException(nameof(from), "Source language cannot be null or empty.");
             }
 
             if (string.IsNullOrWhiteSpace(to))
@@ -54,7 +49,13 @@ namespace GameHubApi.Providers
                 throw new ArgumentNullException(nameof(to), "Target language cannot be null or empty.");
             }
 
-            var route = $"/translate?api-version=3.0&from={from}&to={to}";
+            var route = $"/translate?api-version=3.0&to={to}";
+
+            // from is an optional parameter, so we only add it if it's provided
+            if (!string.IsNullOrWhiteSpace(from))
+            {
+                route += $"&from={from}";
+            }
             var body = new object[] { new { Text = text } };
             var requestBody = JsonSerializer.Serialize(body);
             var request = new HttpRequestMessage
@@ -78,13 +79,12 @@ namespace GameHubApi.Providers
             var jsonResponse = response.Content.ReadAsStringAsync().Result;
             var translationResult = JsonSerializer.Deserialize<List<TranslationResult>>(jsonResponse);
             if (translationResult == null ||
-                !translationResult.Any() ||
-                translationResult[0].Translations.Any() ||
-                string.IsNullOrWhiteSpace(translationResult[0].Translations[0].Text))
+                translationResult.Count != 1 ||
+                !translationResult.Single().Translations.Where(t => t.To.Equals(to, StringComparison.OrdinalIgnoreCase)).Any())
             {
                 throw new InvalidOperationException("Translation result is empty or null.");
             }
-            return translationResult[0].Translations[0].Text!;
+            return translationResult.Single().Translations.Where(t => t.To.Equals(to, StringComparison.OrdinalIgnoreCase)).Single().Text;
         }
     }
 }

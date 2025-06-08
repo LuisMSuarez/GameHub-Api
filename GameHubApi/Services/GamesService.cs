@@ -8,10 +8,12 @@
     {
         private readonly IRawgApi rawgApi;
         private readonly IGameFilter gameFilter;
-        public GamesService(IRawgApi rawgApi, IGameFilter gameFilter)
+        private readonly ITranslator translator;
+        public GamesService(IRawgApi rawgApi, IGameFilter gameFilter, ITranslator translator)
         {
             this.rawgApi = rawgApi ?? throw new ArgumentNullException(nameof(rawgApi));
             this.gameFilter = gameFilter ?? throw new ArgumentNullException(nameof(gameFilter));
+            this.translator = translator ?? throw new ArgumentNullException(nameof(translator));
         }
 
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
@@ -27,7 +29,7 @@
             };
         }
 
-        public async Task<Game> GetGameAsync(string gameId)
+        public async Task<Game> GetGameAsync(string gameId, string? language)
         {
             if (string.IsNullOrWhiteSpace(gameId))
             {
@@ -39,6 +41,11 @@
             {
                 if (this.gameFilter.Filter(game) == FilterResult.Passed)
                 {
+                    if (!string.IsNullOrWhiteSpace(language) && !string.IsNullOrWhiteSpace(game.Description))
+                    {
+                        var translation = await this.translator.Translate(game.Description, null, language);
+                        game.Description = translation;
+                    }
                     return game;
                 }
                 else

@@ -30,6 +30,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
 builder.Services.AddScoped<IGenresService, GenresService>();
+builder.Services.AddScoped<ITranslator, AzureTranslatorApi>();
 
 // Game filter is stateless and thread-safe, so we can register it as a singleton
 builder.Services.AddSingleton<IGameFilter, GameFilter>();

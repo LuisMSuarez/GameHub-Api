@@ -60,7 +60,7 @@
             }
             try
             {
-                var game = await gamesService.GetGameAsync(id);
+                var game = await gamesService.GetGameAsync(id, language);
                 if (game == null)
                 {
                     this.logger.LogWarning("Game with id {Id} not found.", id);
