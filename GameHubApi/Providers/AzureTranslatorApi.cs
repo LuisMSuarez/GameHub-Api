@@ -12,12 +12,10 @@ namespace GameHubApi.Providers
         private const string ApiLocationSecretName = "AzureTranslatorApiLocation";
         private readonly string location;
         private readonly string apiKey;
-        private readonly IHttpContextAccessor httpContextAccessor;
 
         public AzureTranslatorApi(
             IHttpClientFactory httpClientFactory,
-            IConfiguration configuration,
-            IHttpContextAccessor httpContextAccessor)
+            IConfiguration configuration)
         {
             if (httpClientFactory == null)
             {
@@ -29,7 +27,6 @@ namespace GameHubApi.Providers
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             var apiKeyValue = configuration[ApiKeySecretName];
             this.apiKey = apiKeyValue ?? throw new ArgumentNullException(nameof(apiKeyValue));
             var locationValue = configuration[ApiLocationSecretName];
@@ -56,6 +53,7 @@ namespace GameHubApi.Providers
             {
                 route += $"&from={from}";
             }
+
             var body = new object[] { new { Text = text } };
             var requestBody = JsonSerializer.Serialize(body);
             var request = new HttpRequestMessage
@@ -74,7 +72,7 @@ namespace GameHubApi.Providers
             }
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException($"Translation failed with status code {response.StatusCode}: {response.ReasonPhrase}");
+                throw new HttpRequestException($"Translation failed with status code {response.StatusCode}: {response.ReasonPhrase}", null, response.StatusCode);
             }
             var jsonResponse = response.Content.ReadAsStringAsync().Result;
             var translationResult = JsonSerializer.Deserialize<List<TranslationResult>>(jsonResponse);

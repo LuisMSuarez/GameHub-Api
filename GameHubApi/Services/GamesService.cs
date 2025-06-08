@@ -37,24 +37,26 @@
             }
 
             var game = await this.rawgApi.GetGameAsync(gameId);
-            if (game != null)
+            if (game == null)
             {
-                if (this.gameFilter.Filter(game) == FilterResult.Passed)
-                {
-                    if (!string.IsNullOrWhiteSpace(language) && !string.IsNullOrWhiteSpace(game.Description))
-                    {
-                        var translation = await this.translator.Translate(game.Description, null, language);
-                        game.Description = translation;
-                    }
-                    return game;
-                }
-                else
-                {
-                    throw new HttpRequestException("The requested game does not pass the filter criteria.", null, HttpStatusCode.Forbidden);
-                }
+                throw new HttpRequestException("Game not found.", null, HttpStatusCode.NotFound);
             }
 
-            throw new HttpRequestException("Game not found.", null, HttpStatusCode.NotFound);
+            if (this.gameFilter.Filter(game) != FilterResult.Passed)
+            {
+                throw new HttpRequestException("The requested game does not pass the filter criteria.", null, HttpStatusCode.Forbidden);
+            }
+
+            if (!string.IsNullOrWhiteSpace(language) && !string.IsNullOrWhiteSpace(game.Description))
+            {
+                var translation = await this.translator.Translate(game.Description, null, language);
+                
+                // we need to clone the game object to avoid modifying the original which is in the cache, given that it is a reference object
+                var clonedGame = game.Clone() as Game ?? throw new InvalidOperationException("Failed to clone the game object.");
+                clonedGame.Description = translation;
+                return clonedGame;
+            }
+            return game;
         }
 
         public async Task<CollectionResult<Movie>> GetMovies(string gameId)
