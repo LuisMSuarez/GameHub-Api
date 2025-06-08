@@ -1,7 +1,8 @@
 ﻿namespace GameHubApi.Contracts
 {
+    using GameHubApi.Providers;
     using System.Text.Json.Serialization;
-    public class Game
+    public class Game : ICloneable
     {
         [JsonPropertyName("id")]
         public required int Id { get; set; }
@@ -38,5 +39,24 @@
 
         [JsonPropertyName("publishers")]
         public IList<Publisher> Publishers { get; set; } = new List<Publisher>();
+
+        public object Clone()
+        {
+            return new Game
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Slug = this.Slug,
+                BackgroundImage = this.BackgroundImage,
+                Rating = this.Rating,
+                Metacritic = this.Metacritic,
+                RatingTop = this.RatingTop,
+                ParentPlatforms = this.ParentPlatforms,
+                Tags = this.Tags,
+                Description = this.Description,
+                Genres = this.Genres,
+                Publishers = this.Publishers
+            };
+        }
     }
 }

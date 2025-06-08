@@ -17,7 +17,7 @@
                 .Setup(api => api.GetGamesAsync("action", "pc", "name", "search", 1, 20))
                 .ReturnsAsync(expectedResult);
 
-            var gamesService = new GamesService(mockRawgApi.Object, Mock.Of<IGameFilter>());
+            var gamesService = new GamesService(mockRawgApi.Object, Mock.Of<IGameFilter>(), Mock.Of<ITranslator>());
 
             // Act
             var result = await gamesService.GetGamesAsync("action", "pc", "name", "search", 1, 20);
@@ -51,7 +51,7 @@
             mockGameFilter
                 .Setup(filter => filter.Filter(It.Is<Game>(g => g.Name.Equals("Game 2"))))
                 .Returns(FilterResult.Blocked);
-            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object);
+            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>());
 
             // Act
             var result = await gamesService.GetGamesAsync("action", "pc", "name", "search", 1, 20);
@@ -72,7 +72,7 @@
                 .Setup(api => api.GetGamesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ThrowsAsync(new InvalidOperationException("API error"));
 
-            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object);
+            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>());
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>

@@ -50,7 +50,7 @@
         }
 
         [HttpGet("{id}", Name = "GetGameDetails")]
-        public async Task<IActionResult> GetGameDetailsAsync(string id)
+        public async Task<IActionResult> GetGameDetailsAsync(string id, [FromQuery] string? language)
         {
             this.logger.LogInformation("GetGameAsync called for id: {id}", id);
             if (string.IsNullOrWhiteSpace(id))
@@ -60,7 +60,7 @@
             }
             try
             {
-                var game = await gamesService.GetGameAsync(id);
+                var game = await gamesService.GetGameAsync(id, language);
                 if (game == null)
                 {
                     this.logger.LogWarning("Game with id {Id} not found.", id);
@@ -78,7 +78,11 @@
             {
                 this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for id {Id}", id);
                 return StatusCode(StatusCodes.Status403Forbidden);
-
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+            {
+                this.logger.LogWarning(ex, "Cannot fetch game in GetGameAsync for id: {Id}, language:{language}", id, language);
+                return BadRequest();
             }
             catch (Exception ex)
             {
