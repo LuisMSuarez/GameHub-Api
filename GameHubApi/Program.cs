@@ -30,7 +30,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IGamesService, GamesService>();
 builder.Services.AddScoped<IGenresService, GenresService>();
-builder.Services.AddScoped<ITranslator, AzureTranslatorApi>();
 
 // Game filter is stateless and thread-safe, so we can register it as a singleton
 builder.Services.AddSingleton<IGameFilter, GameFilter>();
@@ -78,6 +77,20 @@ builder.Services.AddScoped<Func<string, IRawgApi>>(serviceProvider => key =>
         "Base" => serviceProvider.GetService<RawgApi>() ?? throw new InvalidOperationException("Service of type RawgApi is not registered."),
         "Cached" => serviceProvider.GetService<CachedRawgApi>() ?? throw new InvalidOperationException("Service of type CachedRawgApi is not registered."),
         _ => throw new ArgumentException("Invalid IRawgApi type")
+    };
+});
+
+// Register CachedTranslator as default implementation of the interface
+builder.Services.AddScoped<ITranslator, CachedTranslator>();
+builder.Services.AddScoped<AzureTranslatorApi>();
+builder.Services.AddScoped<CachedTranslator>();
+builder.Services.AddScoped<Func<string, ITranslator>>(serviceProvider => key =>
+{
+    return key switch
+    {
+        "Base" => serviceProvider.GetService<AzureTranslatorApi>() ?? throw new InvalidOperationException("Service of type AzureTranslatorApi is not registered."),
+        "Cached" => serviceProvider.GetService<CachedTranslator>() ?? throw new InvalidOperationException("Service of type CachedTranslator is not registered."),
+        _ => throw new ArgumentException("Invalid ITranslator type")
     };
 });
 
