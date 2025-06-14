@@ -68,13 +68,6 @@ jobs:
           context: ./GameHubApi
           file: ./GameHubApi/Dockerfile
 
-      #- name: Generate artifact attestation
-      #  uses: actions/attest-build-provenance@v2
-      #  with:
-      #    subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-      #    subject-digest: ${{ steps.push.outputs.digest }}
-      #    push-to-registry: true
-
   deploy:
     if: github.event_name == 'push' # Only deploy on push events
     runs-on: ubuntu-latest
