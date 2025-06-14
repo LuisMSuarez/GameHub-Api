@@ -12,11 +12,15 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # This is required for actions/checkout
+      contents: read #This is required for actions/checkout
       packages: write
 
     steps:
@@ -48,7 +52,7 @@ jobs:
       - name: Log in to GitHub container registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
@@ -56,12 +60,20 @@ jobs:
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Build and push container image to registry
+        id: push
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
           context: ./GameHubApi
           file: ./GameHubApi/Dockerfile
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
 
   deploy:
     if: github.event_name == 'push' # Only deploy on push events
