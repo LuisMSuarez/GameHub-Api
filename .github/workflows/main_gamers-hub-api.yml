@@ -56,15 +56,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-
       - name: Build and push container image to registry
         id: push
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           context: ./GameHubApi
           file: ./GameHubApi/Dockerfile
 
@@ -119,9 +116,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_962D352C85D64D71BC1CEEDC868305C4 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_571F434DC71B4E948F4FECED40A72A0C }}
 
-      - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp-container
         uses: azure/webapps-deploy@v2
@@ -129,4 +123,4 @@ jobs:
           app-name: 'gamers-hub-api-cnt'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_280F245B9142435BBE1B54475C5A7169 }}
-          images: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
+          images: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}'
