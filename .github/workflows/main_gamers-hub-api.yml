@@ -119,6 +119,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_962D352C85D64D71BC1CEEDC868305C4 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_571F434DC71B4E948F4FECED40A72A0C }}
 
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp-container
         uses: azure/webapps-deploy@v2
