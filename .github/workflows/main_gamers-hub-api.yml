@@ -132,5 +132,5 @@ jobs:
         with:
           app-name: 'gamers-hub-api-cnt'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_CONTAINER_PUBLISH_PROFILE }}
-          images: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_280F245B9142435BBE1B54475C5A7169 }}
+          images: '${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}'
