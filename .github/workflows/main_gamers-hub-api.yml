@@ -60,7 +60,7 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
           context: ./GameHubApi
-          file: ./Dockerfile
+          file: ./GameHubApi/Dockerfile
 
   deploy:
     if: github.event_name == 'push' # Only deploy on push events
