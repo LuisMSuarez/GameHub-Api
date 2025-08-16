@@ -2,6 +2,7 @@
 {
     using GameHubApi.Contracts;
     using GameHubApi.Services;
+    using GameHubApi.Services.Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using System.Net;
@@ -37,7 +38,7 @@
                 this.logger.LogInformation("GetGamesAsync successfully fetched {Count} games.", result.Count);
                 return Ok(result);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            catch (ServiceException ex) when (ex.ResultCode == ServiceResultCode.NotFound)
             {
                 this.logger.LogWarning(ex, "The requested resource was not found in GetGamesAsync.");
                 return NotFound();
@@ -69,20 +70,15 @@
                 this.logger.LogInformation("GetGameAsync successfully fetched game with id: {Id}", id);
                 return Ok(game);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            catch (ServiceException ex) when (ex.ResultCode == ServiceResultCode.NotFound)
             {
                 this.logger.LogWarning(ex, "The requested game was not found in GetGameAsync for id: {Id}", id);
                 return NotFound();
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+            catch (ServiceException ex) when (ex.ResultCode == ServiceResultCode.Forbidden)
             {
                 this.logger.LogWarning(ex, "The requested game cannot be accessed in GetGameAsync for id {Id}", id);
                 return StatusCode(StatusCodes.Status403Forbidden);
-            }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
-            {
-                this.logger.LogWarning(ex, "Cannot fetch game in GetGameAsync for id: {Id}, language:{language}", id, language);
-                return BadRequest();
             }
             catch (Exception ex)
             {
@@ -107,7 +103,7 @@
                 this.logger.LogInformation("GetGameMoviesAsync successfully fetched {Count} movies.", result.Count);
                 return Ok(result);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            catch (ServiceException ex) when (ex.ResultCode == ServiceResultCode.NotFound)
             {
                 this.logger.LogWarning(ex, "The requested resource was not found in GetGameMoviesAsync.");
                 return NotFound();
@@ -135,7 +131,7 @@
                 this.logger.LogInformation("GetGameScreenshotsAsync successfully fetched {Count} movies.", result.Count);
                 return Ok(result);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            catch (ServiceException ex) when (ex.ResultCode == ServiceResultCode.NotFound)
             {
                 this.logger.LogWarning(ex, "The requested resource was not found in GetGameScreenshotsAsync.");
                 return NotFound();

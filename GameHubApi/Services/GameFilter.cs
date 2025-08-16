@@ -1,7 +1,7 @@
-﻿using GameHubApi.Contracts;
-
-namespace GameHubApi.Services
+﻿namespace GameHubApi.Services
 {
+    using GameHubApi.Contracts;
+
     public class GameFilter : IGameFilter
     {
         private const string BlockedTagsKey = "BlockedTags";

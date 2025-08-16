@@ -1,9 +1,9 @@
-﻿using GameHubApi.Contracts;
-using System.Text;
-using System.Text.Json;
-
-namespace GameHubApi.Providers
+﻿namespace GameHubApi.Providers
 {
+    using GameHubApi.Providers.Exceptions;
+    using System.Text;
+    using System.Text.Json;
+
     public class AzureTranslatorApi : ITranslator
     {
         private readonly HttpClient httpClient;
@@ -68,11 +68,15 @@ namespace GameHubApi.Providers
             var response = await this.httpClient.SendAsync(request);
             if (response == null)
             {
-                throw new InvalidOperationException("Response from Azure Translator API is null.");
+                throw new ProviderException(
+                    ProviderResultCode.DataAccessError,
+                    "Response from Azure Translator API is null.");
             }
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException($"Translation failed with status code {response.StatusCode}: {response.ReasonPhrase}", null, response.StatusCode);
+                throw new ProviderException(
+                    ProviderResultCode.InternalServerError,
+                    $"Translation failed with status code {response.StatusCode}: {response.ReasonPhrase}");
             }
             var jsonResponse = response.Content.ReadAsStringAsync().Result;
             var translationResult = JsonSerializer.Deserialize<List<TranslationResult>>(jsonResponse);
@@ -80,7 +84,9 @@ namespace GameHubApi.Providers
                 translationResult.Count != 1 ||
                 !translationResult.Single().Translations.Where(t => t.To.Equals(to, StringComparison.OrdinalIgnoreCase)).Any())
             {
-                throw new InvalidOperationException("Translation result is empty or null.");
+                throw new ProviderException(
+                    ProviderResultCode.InternalServerError,
+                    "Translation result is empty or null.");
             }
             return translationResult.Single().Translations.Where(t => t.To.Equals(to, StringComparison.OrdinalIgnoreCase)).Single().Text;
         }
