@@ -1,11 +1,13 @@
 ﻿namespace GameHubApi.Providers
 {
     using GameHubApi.Contracts;
+    using GameHubApi.Providers.Exceptions;
     using System;
     using System.Net;
     using System.Text;
     using System.Text.Json;
     using System.Web;
+
     public class RawgApi : IRawgApi
     {
         private readonly HttpClient httpClient;
@@ -103,17 +105,27 @@
         private async Task<T> GetAsync<T>(string url)
         {
             var response = await httpClient.GetAsync(url);
+            if (response == null)
+            {
+                throw new ProviderException(
+                    ProviderResultCode.DataAccessError,
+                    "The response from the RAWG API Get call was null.");
+            }
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 // Handle case where RAWG API returns 404 Not Found
-                throw new HttpRequestException("The requested resource was not found.", null, HttpStatusCode.NotFound);
+                throw new ProviderException(
+                    ProviderResultCode.NotFound,
+                    "The requested resource was not found.");
             }
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<T>(content);
             if (result == null)
             {
-                throw new InvalidOperationException("Failed to deserialize the response content.");
+                throw new ProviderException(
+                    ProviderResultCode.DataAccessError,
+                    "Failed to deserialize the response.");
             }
             return result;
         }
@@ -127,7 +139,9 @@
 
             if (httpContextAccessor.HttpContext == null)
             {
-                throw new InvalidOperationException("HttpContext is not available.");
+                throw new ProviderException(
+                    ProviderResultCode.InternalServerError,
+                    "HttpContext is not available.");
             }
 
             // Obtain the hostname from the current HTTP context

@@ -2,7 +2,8 @@
 {
     using GameHubApi.Contracts;
     using GameHubApi.Providers;
-    using System.Net;
+    using GameHubApi.Providers.Exceptions;
+    using GameHubApi.Services.Exceptions;
 
     public class GamesService : IGamesService
     {
@@ -36,15 +37,36 @@
                 throw new ArgumentException("Id cannot be null or empty.", nameof(gameId));
             }
 
-            var game = await this.rawgApi.GetGameAsync(gameId);
+            Game game;
+            try
+            {
+                game = await this.rawgApi.GetGameAsync(gameId);
+            }
+            catch (ProviderException ex) when (ex.ResultCode == ProviderResultCode.NotFound)
+            {
+                throw new ServiceException(
+                    ServiceResultCode.NotFound,
+                    "Game not found.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException(
+                    ServiceResultCode.InternalServerError,
+                    "An error occurred while fetching the game details.", ex);
+            }
+
             if (game == null)
             {
-                throw new HttpRequestException("Game not found.", null, HttpStatusCode.NotFound);
+                throw new ServiceException(
+                    ServiceResultCode.NotFound,
+                    "Game not found.");
             }
 
             if (this.gameFilter.Filter(game) != FilterResult.Passed)
             {
-                throw new HttpRequestException("The requested game does not pass the filter criteria.", null, HttpStatusCode.Forbidden);
+                throw new ServiceException(
+                    ServiceResultCode.Forbidden,
+                    "The requested game does not pass the filter criteria.");
             }
 
             if (!string.IsNullOrWhiteSpace(language) && !string.IsNullOrWhiteSpace(game.Description))
@@ -61,12 +83,42 @@
 
         public async Task<CollectionResult<Movie>> GetMovies(string gameId)
         {
-            return await this.rawgApi.GetMovies(gameId);
+            try
+            {
+                return await this.rawgApi.GetMovies(gameId);
+            }
+            catch (ProviderException ex) when (ex.ResultCode == ProviderResultCode.NotFound)
+            {
+                throw new ServiceException(
+                    ServiceResultCode.NotFound,
+                    "Movies not found for the specified game.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException(
+                    ServiceResultCode.InternalServerError,
+                    "An error occurred while fetching the movies.", ex);
+            }
         }
 
         public async Task<CollectionResult<Screenshot>> GetScreenshots(string gameId)
         {
-            return await this.rawgApi.GetScreenshots(gameId);
+            try
+            {
+                return await this.rawgApi.GetScreenshots(gameId);
+            }
+            catch (ProviderException ex) when (ex.ResultCode == ProviderResultCode.NotFound)
+            {
+                throw new ServiceException(
+                    ServiceResultCode.NotFound,
+                    "Screenshots not found for the specified game.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException(
+                    ServiceResultCode.InternalServerError,
+                    "An error occurred while fetching the screenshots.", ex);
+            }
         }
     }
 }
