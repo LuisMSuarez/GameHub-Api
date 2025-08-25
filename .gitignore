@@ -15,3 +15,12 @@ GameHubApi/GameHubApi.csproj.user
 /GameHubApi.Contracts/obj
 /GameHubApi.Contracts/bin
 /Providers/bin
+/Providers/bin
+/Providers/bin
+/Providers/bin
+/GameHubApi.Providers/bin
+/GameHubApi.Providers/obj
+/GameHubApi.Tests/bin
+/GameHubApi.Tests/obj
+/GameHubApi.Tests/TestResults
+/Providers/bin

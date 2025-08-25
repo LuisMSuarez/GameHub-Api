@@ -5,9 +5,9 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi", "GameHubApi\GameHubApi.csproj", "{1AB392E4-CC6A-4C33-B67A-D6760BF7EBE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApiTests", "GameHubApiTests\GameHubApiTests.csproj", "{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Tests", "GameHubApi.Tests\GameHubApi.Tests.csproj", "{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Providers", "Providers\GameHubApi.Providers.csproj", "{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Providers", "GameHubApi.Providers\GameHubApi.Providers.csproj", "{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Contracts", "GameHubApi.Contracts\GameHubApi.Contracts.csproj", "{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}"
 EndProject
