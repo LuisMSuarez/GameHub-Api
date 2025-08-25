@@ -1,6 +1,6 @@
 ﻿namespace GameHubApi.Providers
 {
-    using GameHubApi.Providers.Contracts;
+    using GameHubApi.Contracts;
     using Microsoft.Extensions.Logging;
     using System.Text;
 

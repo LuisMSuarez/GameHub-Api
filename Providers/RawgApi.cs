@@ -1,6 +1,6 @@
 ﻿namespace GameHubApi.Providers
 {
-    using GameHubApi.Providers.Contracts;
+    using GameHubApi.Contracts;
     using GameHubApi.Providers.Exceptions;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;

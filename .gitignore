@@ -12,3 +12,6 @@
 /GameHubApiTests/TestResults
 GameHubApi/GameHubApi.csproj.user
 /Providers/obj
+/GameHubApi.Contracts/obj
+/GameHubApi.Contracts/bin
+/Providers/bin
