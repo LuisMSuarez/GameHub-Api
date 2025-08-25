@@ -1,6 +1,7 @@
 ﻿namespace GameHubApi.Providers
 {
-    using GameHubApi.Contracts;
+    using GameHubApi.Providers.Contracts;
+    using Microsoft.Extensions.Logging;
     using System.Text;
 
     public class CachedRawgApi : IRawgApi

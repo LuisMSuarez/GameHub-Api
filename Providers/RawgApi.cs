@@ -1,12 +1,15 @@
 ﻿namespace GameHubApi.Providers
 {
-    using GameHubApi.Contracts;
+    using GameHubApi.Providers.Contracts;
     using GameHubApi.Providers.Exceptions;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Configuration;
     using System;
     using System.Net;
     using System.Text;
     using System.Text.Json;
     using System.Web;
+
 
     public class RawgApi : IRawgApi
     {

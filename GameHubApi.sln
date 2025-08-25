@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi", "GameHubApi\Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApiTests", "GameHubApiTests\GameHubApiTests.csproj", "{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Providers", "Providers\Providers.csproj", "{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Providers", "Providers\GameHubApi.Providers.csproj", "{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

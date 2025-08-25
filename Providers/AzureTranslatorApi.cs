@@ -1,6 +1,7 @@
 ﻿namespace GameHubApi.Providers
 {
     using GameHubApi.Providers.Exceptions;
+    using Microsoft.Extensions.Configuration;
     using System.Text;
     using System.Text.Json;
 
