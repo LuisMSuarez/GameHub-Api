@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Providers", "Gam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Contracts", "GameHubApi.Contracts\GameHubApi.Contracts.csproj", "{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Services", "GameHubApi.Services\GameHubApi.Services.csproj", "{918C5068-0828-475A-B7D7-C30D7337BE09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Release|Any CPU.Build.0 = Release|Any CPU
+		{918C5068-0828-475A-B7D7-C30D7337BE09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{918C5068-0828-475A-B7D7-C30D7337BE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{918C5068-0828-475A-B7D7-C30D7337BE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{918C5068-0828-475A-B7D7-C30D7337BE09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
