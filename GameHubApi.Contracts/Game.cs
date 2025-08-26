@@ -1,6 +1,5 @@
 ﻿namespace GameHubApi.Contracts
 {
-    using GameHubApi.Providers;
     using System.Text.Json.Serialization;
     public class Game : ICloneable
     {

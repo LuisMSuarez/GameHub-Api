@@ -12,16 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["GameHubApi.csproj", "."]
-RUN dotnet restore "./GameHubApi.csproj"
+# Copy entire solution context (including referenced projects)
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./GameHubApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Restore using the solution file
+RUN dotnet restore "GameHubApi.sln"
+# Build the main project
+WORKDIR /src/GameHubApi
+RUN dotnet build "GameHubApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./GameHubApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR /src/GameHubApi
+RUN dotnet publish "./GameHubApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish --no-restore /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

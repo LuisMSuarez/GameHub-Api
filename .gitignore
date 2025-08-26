@@ -11,3 +11,10 @@
 /myapp
 /GameHubApiTests/TestResults
 GameHubApi/GameHubApi.csproj.user
+/GameHubApi.Contracts/obj
+/GameHubApi.Contracts/bin
+/GameHubApi.Providers/bin
+/GameHubApi.Providers/obj
+/GameHubApi.Tests/bin
+/GameHubApi.Tests/obj
+/GameHubApi.Tests/TestResults

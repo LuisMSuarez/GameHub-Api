@@ -16,4 +16,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GameHubApi.Contracts\GameHubApi.Contracts.csproj" />
+    <ProjectReference Include="..\GameHubApi.Providers\GameHubApi.Providers.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -5,7 +5,11 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi", "GameHubApi\GameHubApi.csproj", "{1AB392E4-CC6A-4C33-B67A-D6760BF7EBE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApiTests", "GameHubApiTests\GameHubApiTests.csproj", "{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Tests", "GameHubApi.Tests\GameHubApi.Tests.csproj", "{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Providers", "GameHubApi.Providers\GameHubApi.Providers.csproj", "{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Contracts", "GameHubApi.Contracts\GameHubApi.Contracts.csproj", "{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C59222C-53C6-4F4B-92E6-EAF4D08424DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D31DFC5B-3968-4C50-ACD3-7E104E9A0647}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
