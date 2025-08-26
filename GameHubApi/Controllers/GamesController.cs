@@ -1,11 +1,9 @@
 ﻿namespace GameHubApi.Controllers
 {
-    using GameHubApi.Contracts;
     using GameHubApi.Services;
     using GameHubApi.Services.Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using System.Net;
 
     [Route("v1/[controller]")]
     [ApiController]
