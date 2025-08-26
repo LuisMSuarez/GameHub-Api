@@ -64,8 +64,8 @@ jobs:
         with:
           push: ${{ github.event_name == 'push' }} # always build the container, but only push to the registry on code push
           tags: ${{ env.REGISTRY }}/${{ env.REPO }}:${{ github.sha }}
-          context: .
-          file: ./Dockerfile
+          context: ./GameHubApi
+          file: ./GameHubApi/Dockerfile
 
   deploy:
     if: github.event_name == 'push' # Only deploy on push events
