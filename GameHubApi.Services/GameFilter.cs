@@ -14,18 +14,15 @@
 
             var blockedTagsValue = configuration[BlockedTagsKey];
             this.blockedTags = string.IsNullOrWhiteSpace(blockedTagsValue)
-                ? Array.Empty<string>()
-                : blockedTagsValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                ? []
+                : blockedTagsValue.Split([','], StringSplitOptions.RemoveEmptyEntries)
                                   .Select(tag => tag.Trim())
                                   .ToArray();
 
         }
         public FilterResult Filter(Game game)
         {
-            if (game == null)
-            {
-                throw new ArgumentNullException(nameof(game));
-            }
+            ArgumentNullException.ThrowIfNull(game);
 
             // Check if the game has any blocked tags
             if (game.Tags != null &&
