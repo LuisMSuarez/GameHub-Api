@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "GameHubApi.Controllers": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:64382;http://localhost:64383"
+    }
+  }
+}

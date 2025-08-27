@@ -20,3 +20,5 @@ GameHubApi/GameHubApi.csproj.user
 /GameHubApi.Tests/TestResults
 /GameHubApi.Services/bin
 /GameHubApi.Services/obj
+/GameHubApi.Controllers/bin
+/GameHubApi.Controllers/obj

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameHubApi.Contracts\GameHubApi.Contracts.csproj" />
+    <ProjectReference Include="..\GameHubApi.Controllers\GameHubApi.Controllers.csproj" />
     <ProjectReference Include="..\GameHubApi.Providers\GameHubApi.Providers.csproj" />
     <ProjectReference Include="..\GameHubApi.Services\GameHubApi.Services.csproj" />
   </ItemGroup>
