@@ -1,6 +1,7 @@
 ﻿namespace GameHubApi.Services
 {
     using GameHubApi.Contracts;
+    using Microsoft.Extensions.Configuration;
 
     public class GameFilter : IGameFilter
     {
@@ -9,10 +10,7 @@
 
         public GameFilter(IConfiguration configuration)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
+            ArgumentNullException.ThrowIfNull(configuration);
 
             var blockedTagsValue = configuration[BlockedTagsKey];
             this.blockedTags = string.IsNullOrWhiteSpace(blockedTagsValue)
