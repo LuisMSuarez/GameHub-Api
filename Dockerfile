@@ -17,17 +17,17 @@ COPY . .
 # Restore using the solution file
 RUN dotnet restore "GameHubApi.sln"
 # Build the main project
-WORKDIR /src/GameHubApi
-RUN dotnet build "GameHubApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR /src/GameHubApi.Host
+RUN dotnet build "GameHubApi.Host.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src/GameHubApi
-RUN dotnet publish "./GameHubApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish --no-restore /p:UseAppHost=false
+WORKDIR /src/GameHubApi.Host
+RUN dotnet publish "./GameHubApi.Host.csproj" -c $BUILD_CONFIGURATION -o /app/publish --no-restore /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "GameHubApi.dll"]
+ENTRYPOINT ["dotnet", "GameHubApi.Host.dll"]

@@ -20,3 +20,10 @@ GameHubApi/GameHubApi.csproj.user
 /GameHubApi.Tests/TestResults
 /GameHubApi.Services/bin
 /GameHubApi.Services/obj
+/GameHubApi.Controllers/bin
+/GameHubApi.Controllers/obj
+/GameHubApi.Host/bin
+/GameHubApi.Host/obj
+/GameHubApi.Host/Properties/PublishProfiles
+GameHubApi.Host/GameHubApi.Host.csproj.user
+/GameHubApi.Host/Properties
