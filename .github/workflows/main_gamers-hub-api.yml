@@ -37,7 +37,7 @@ jobs:
         run: dotnet test --no-build --configuration Release --logger trx
 
       - name: Publish artifacts
-        run: dotnet publish GameHubApi/GameHubApi.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish GameHubApi.Host/GameHubApi.Host.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4

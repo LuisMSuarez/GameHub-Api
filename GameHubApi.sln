@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Host", "GameHubApi\GameHubApi.Host.csproj", "{1AB392E4-CC6A-4C33-B67A-D6760BF7EBE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Host", "GameHubApi.Host\GameHubApi.Host.csproj", "{1AB392E4-CC6A-4C33-B67A-D6760BF7EBE0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameHubApi.Tests", "GameHubApi.Tests\GameHubApi.Tests.csproj", "{8C9DB07F-DF9F-400E-88DF-9ABC9FECD237}"
 EndProject
