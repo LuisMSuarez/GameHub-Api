@@ -20,9 +20,14 @@ builder.Services.AddCors(options =>
     // cors policy to only allow GET requests from allow-list origins
     options.AddPolicy("SpecificOrigins", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "https://gamers-hub.azurewebsites.net") // allowed origins
-                .WithMethods("GET") // Only allow GET 
-                .AllowAnyHeader();
+        policy
+            .WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "https://gamers-hub.azurewebsites.net",
+                "https://gamers-hub-cnt.azurewebsites.net") // allowed origins
+            .WithMethods("GET") // Only allow GET 
+            .AllowAnyHeader();
     });
 });
 
