@@ -82,14 +82,15 @@
             var jsonResponse = response.Content.ReadAsStringAsync().Result;
             var translationResult = JsonSerializer.Deserialize<List<TranslationResult>>(jsonResponse);
             if (translationResult == null ||
-                translationResult.Count != 1 ||
-                !translationResult.Single().Translations.Where(t => t.To.Equals(to, StringComparison.OrdinalIgnoreCase)).Any())
+                translationResult.Count < 1 ||
+                translationResult.First().Translations == null ||
+                translationResult.First().Translations.Count < 1)
             {
                 throw new ProviderException(
                     ProviderResultCode.InternalServerError,
                     "Translation result is empty or null.");
             }
-            return translationResult.Single().Translations.Where(t => t.To.Equals(to, StringComparison.OrdinalIgnoreCase)).Single().Text;
+            return translationResult.First().Translations.First().Text;
         }
     }
 }
