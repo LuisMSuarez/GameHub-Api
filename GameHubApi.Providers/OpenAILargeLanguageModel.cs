@@ -5,7 +5,7 @@ using OpenAI.Chat;
 
 namespace GameHubApi.Providers
 {
-    internal class OpenAILargeLanguageModel : ILargeLanguageModel
+    public class OpenAILargeLanguageModel : ILargeLanguageModel
     {
         private const string SecretName = "OpenAIKey";
         private readonly string apiKey;
