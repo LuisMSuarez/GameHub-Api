@@ -3,6 +3,7 @@
     using GameHubApi.Contracts;
     using GameHubApi.Providers;
     using Microsoft.Extensions.Configuration;
+    using System.Collections.Generic;
 
     public class GameFilter : IGameFilter
     {
@@ -27,7 +28,33 @@
 
 
         }
-        public Task<FilterResult> FilterAsync(Game game)
+        public async Task<FilterResult> FilterAsync(Game game)
+        {
+            // First stage filtering using local rules
+            var localFilterResult = this.FilterLocal(game);
+            if (localFilterResult != FilterResult.Passed)
+            {
+                return localFilterResult;
+            }
+
+            // Second stage filtering using AI
+            return await this.aiGameFilter.FilterAsync(game);
+        }
+
+        public async Task<IEnumerable<FilterResult>> FilterAsync(IEnumerable<Game> games)
+        {
+            var tasks = games.Select(async game =>
+            {
+                var result = this.FilterLocal(game);
+                return result == FilterResult.Blocked
+                    ? result
+                    : await this.aiGameFilter.FilterAsync(game);
+            });
+
+            return await Task.WhenAll(tasks);
+        }
+
+        private FilterResult FilterLocal(Game game)
         {
             ArgumentNullException.ThrowIfNull(game);
 
@@ -35,26 +62,23 @@
             if (game.Tags != null &&
                 game.Tags.Any(tag => blockedTags.Contains(tag.Name, StringComparer.OrdinalIgnoreCase)))
             {
-                return Task.FromResult(FilterResult.Blocked);
+                return FilterResult.Blocked;
             }
 
             // Check if the game name contains any blocked tags
             if (blockedTags.Any(tag => game.Name.Contains(tag, StringComparison.OrdinalIgnoreCase)))
             {
-                return Task.FromResult(FilterResult.Blocked);
+                return FilterResult.Blocked;
             }
 
             // Check if the description contains any blocked tags
             if (!string.IsNullOrWhiteSpace(game.Description) &&
                 blockedTags.Any(tag => game.Description.Contains(tag, StringComparison.OrdinalIgnoreCase)))
             {
-                return Task.FromResult(FilterResult.Blocked);
+                return FilterResult.Blocked;
             }
 
-            // TODO: Use AI-based filtering for more complex content analysis
-            // return this.aiGameFilter.FilterAsync(game);
-            return Task.FromResult(FilterResult.Passed);
-            
+            return FilterResult.Passed;
         }
     }
 }

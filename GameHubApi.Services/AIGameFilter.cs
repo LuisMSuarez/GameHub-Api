@@ -28,5 +28,11 @@ namespace GameHubApi.Services
 
             return result.Message.Contains("Blocked") ? FilterResult.Blocked : FilterResult.Passed;
         }
+
+        public async Task<IEnumerable<FilterResult>> FilterAsync(IEnumerable<Game> games)
+        {
+            var tasks = games.Select(game => this.FilterAsync(game));
+            return await Task.WhenAll(tasks);
+        }
     }
 }

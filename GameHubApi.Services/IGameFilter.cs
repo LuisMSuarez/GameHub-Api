@@ -5,5 +5,6 @@ namespace GameHubApi.Services
     public interface IGameFilter
     {
         Task<FilterResult> FilterAsync(Game game);
+        Task<IEnumerable<FilterResult>> FilterAsync(IEnumerable<Game> games);
     }
 }
