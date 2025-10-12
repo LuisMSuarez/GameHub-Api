@@ -1,14 +1,18 @@
 ﻿namespace GameHubApi.Services
 {
     using GameHubApi.Contracts;
+    using GameHubApi.Providers;
     using Microsoft.Extensions.Configuration;
 
     public class GameFilter : IGameFilter
     {
         private const string BlockedTagsKey = "BlockedTags";
         private readonly string[] blockedTags;
+        private readonly IGameFilter aiGameFilter;
 
-        public GameFilter(IConfiguration configuration)
+        public GameFilter(
+            IConfiguration configuration,
+            Func<string, IGameFilter> gameFilterFactory)
         {
             ArgumentNullException.ThrowIfNull(configuration);
 
@@ -19,8 +23,11 @@
                                   .Select(tag => tag.Trim())
                                   .ToArray();
 
+            this.aiGameFilter = gameFilterFactory("AI") ?? throw new ArgumentNullException(nameof(aiGameFilter));
+
+
         }
-        public FilterResult Filter(Game game)
+        public Task<FilterResult> FilterAsync(Game game)
         {
             ArgumentNullException.ThrowIfNull(game);
 
@@ -28,23 +35,25 @@
             if (game.Tags != null &&
                 game.Tags.Any(tag => blockedTags.Contains(tag.Name, StringComparer.OrdinalIgnoreCase)))
             {
-                return FilterResult.Blocked;
+                return Task.FromResult(FilterResult.Blocked);
             }
 
             // Check if the game name contains any blocked tags
             if (blockedTags.Any(tag => game.Name.Contains(tag, StringComparison.OrdinalIgnoreCase)))
             {
-                return FilterResult.Blocked;
+                return Task.FromResult(FilterResult.Blocked);
             }
 
             // Check if the description contains any blocked tags
             if (!string.IsNullOrWhiteSpace(game.Description) &&
                 blockedTags.Any(tag => game.Description.Contains(tag, StringComparison.OrdinalIgnoreCase)))
             {
-                return FilterResult.Blocked;
+                return Task.FromResult(FilterResult.Blocked);
             }
 
-            return FilterResult.Passed;
+            // return Task.FromResult(FilterResult.Passed);
+            return this.aiGameFilter.FilterAsync(game);
+
         }
     }
 }

@@ -38,8 +38,21 @@ builder.Services.AddScoped<IGenresService, GenresService>();
 builder.Services.AddScoped<ITranslator, AzureTranslatorApi>();
 builder.Services.AddScoped<ILargeLanguageModel, OpenAILargeLanguageModel>();
 
+// Register IGameFilter factory to enable creation of instances of GameFilter and AIGameFilter based on the key provided.
+// This allows for easy switching between different implementations of IGameFilter.
+// For this to work, we must also register the concrete implementations so they can be resolved by the factory.
 // Game filter is stateless and thread-safe, so we can register it as a singleton
-builder.Services.AddSingleton<IGameFilter, GameFilter>();
+builder.Services.AddScoped<IGameFilter, GameFilter>();
+builder.Services.AddScoped<AIGameFilter>();
+builder.Services.AddScoped<Func<string, IGameFilter>>(serviceProvider => key =>
+{
+    return key switch
+    {
+        "Base" => serviceProvider.GetService<GameFilter>() ?? throw new InvalidOperationException("Service of type GameFilter is not registered."),
+        "AI" => serviceProvider.GetService<AIGameFilter>() ?? throw new InvalidOperationException("Service of type AIGameFilter is not registered."),
+        _ => throw new ArgumentException("Invalid IGameFilter type")
+    };
+});
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();

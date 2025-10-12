@@ -29,13 +29,13 @@ namespace GameHubApi.Providers
 
             var response = await chat.CompleteChatAsync(new ChatMessage[]
             {
-                new SystemChatMessage("You are a concise assistant."),
-                new UserChatMessage("Give me a one-line fun fact about C#.")
+                new SystemChatMessage(query.Instructions),
+                new UserChatMessage(query.Query)
             });
 
             return new GenerateResponseResult
             {
-                Message = response.Value.ToString() ?? string.Empty
+                Message = response?.Value?.Content?.FirstOrDefault()?.Text ?? string.Empty
             };
         }
     }

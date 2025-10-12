@@ -20,13 +20,18 @@
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
         {
             var getGamesResult = await this.rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
-            var filteredGames = getGamesResult.Results.Where(g => this.gameFilter.Filter(g) == FilterResult.Passed);
+            var filteredGames = await Task.WhenAll(getGamesResult.Results.Select(async g => new
+            {
+                Game = g,
+                FilterResult = await this.gameFilter.FilterAsync(g)
+            }));
+
             return new CollectionResult<Game>
             {
                 Count = getGamesResult.Count,
                 Next = getGamesResult.Next,
                 Previous = getGamesResult.Previous,
-                Results = filteredGames.ToList()
+                Results = filteredGames.Where(g => g.FilterResult == FilterResult.Passed).Select(g => g.Game).ToList()
             };
         }
 
@@ -62,7 +67,7 @@
                     "Game not found.");
             }
 
-            if (this.gameFilter.Filter(game) != FilterResult.Passed)
+            if (await this.gameFilter.FilterAsync(game) != FilterResult.Passed)
             {
                 throw new ServiceException(
                     ServiceResultCode.Forbidden,
