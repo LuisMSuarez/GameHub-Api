@@ -2,6 +2,7 @@ using Azure.Identity;
 using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Services;
+using OpenAI.Chat;
 var builder = WebApplication.CreateBuilder(args);
 
 var keyVaultVariable = Environment.GetEnvironmentVariable("SERVICE_KEYVAULT");
@@ -52,6 +53,13 @@ builder.Services.AddScoped<Func<string, IGameFilter>>(serviceProvider => key =>
         "AI" => serviceProvider.GetService<AIGameFilter>() ?? throw new InvalidOperationException("Service of type AIGameFilter is not registered."),
         _ => throw new ArgumentException("Invalid IGameFilter type")
     };
+});
+
+builder.Services.AddSingleton(provider =>
+{
+    var config = provider.GetRequiredService<IConfiguration>();
+    var apiKey = config["OpenAIKey"];
+    return new ChatClient(model: "gpt-4o-mini", apiKey: apiKey);
 });
 
 // Register HttpClient for use by Providers
