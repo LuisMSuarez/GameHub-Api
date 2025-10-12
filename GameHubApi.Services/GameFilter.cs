@@ -43,15 +43,32 @@
 
         public async Task<IEnumerable<FilterResult>> FilterAsync(IEnumerable<Game> games)
         {
-            var tasks = games.Select(async game =>
+            var localFilterResults = games.Select(g => new
             {
-                var result = this.FilterLocal(game);
-                return result == FilterResult.Blocked
-                    ? result
-                    : await this.aiGameFilter.FilterAsync(game);
-            });
+                Game = g,
+                LocalFilter = this.FilterLocal(g)
+            }).ToList();
 
-            return await Task.WhenAll(tasks);
+            // For games that passed local filtering, apply AI filtering in batch request.
+            var aiFilterResult = (await this.aiGameFilter.FilterAsync(
+                localFilterResults.Where(lf => lf.LocalFilter == FilterResult.Passed)
+                           .Select(lf => lf.Game))).ToList();
+
+            var result = new List<FilterResult>();
+            int aiIndex = 0;
+            for (int i = 0; i< games.Count(); i++)
+            {
+                var localResult = localFilterResults[i];
+                if (localResult.LocalFilter != FilterResult.Passed)
+                {
+                    result.Add(localResult.LocalFilter);
+                }
+                else
+                {
+                    result.Add(aiFilterResult[aiIndex++]);
+                }
+            }
+            return result;
         }
 
         private FilterResult FilterLocal(Game game)

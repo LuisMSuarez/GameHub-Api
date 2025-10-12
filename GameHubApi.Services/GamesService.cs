@@ -20,18 +20,16 @@
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
         {
             var getGamesResult = await this.rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
-            var filteredGames = await Task.WhenAll(getGamesResult.Results.Select(async g => new
-            {
-                Game = g,
-                FilterResult = await this.gameFilter.FilterAsync(g)
-            }));
+            var filterResult = await this.gameFilter.FilterAsync(getGamesResult.Results);
+            var zippedGames = getGamesResult.Results.Zip(filterResult, (game, filterResult) => new { game, filterResult });
+            var passedGames = zippedGames.Where(z => z.filterResult == FilterResult.Passed).Select(z => z.game);
 
             return new CollectionResult<Game>
             {
-                Count = getGamesResult.Count,
+                Count = passedGames.Count(),
                 Next = getGamesResult.Next,
                 Previous = getGamesResult.Previous,
-                Results = filteredGames.Where(g => g.FilterResult == FilterResult.Passed).Select(g => g.Game).ToList()
+                Results = passedGames.ToList()
             };
         }
 
