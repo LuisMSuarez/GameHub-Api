@@ -51,9 +51,10 @@
                 return Task.FromResult(FilterResult.Blocked);
             }
 
-            // return Task.FromResult(FilterResult.Passed);
-            return this.aiGameFilter.FilterAsync(game);
-
+            // TODO: Use AI-based filtering for more complex content analysis
+            // return this.aiGameFilter.FilterAsync(game);
+            return Task.FromResult(FilterResult.Passed);
+            
         }
     }
 }
