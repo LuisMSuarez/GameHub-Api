@@ -46,11 +46,11 @@
 
             var mockGameFilter = new Mock<IGameFilter>();
             mockGameFilter
-                .Setup(filter => filter.Filter(It.Is<Game>(g => g.Name.Equals("Game 1"))))
-                .Returns(FilterResult.Passed);
+                .Setup(filter => filter.FilterAsync(It.Is<Game>(g => g.Name.Equals("Game 1"))))
+                .ReturnsAsync(FilterResult.Passed);
             mockGameFilter
-                .Setup(filter => filter.Filter(It.Is<Game>(g => g.Name.Equals("Game 2"))))
-                .Returns(FilterResult.Blocked);
+                .Setup(filter => filter.FilterAsync(It.Is<Game>(g => g.Name.Equals("Game 2"))))
+                .ReturnsAsync(FilterResult.Blocked);
             var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>());
 
             // Act
