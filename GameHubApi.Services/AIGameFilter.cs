@@ -1,6 +1,7 @@
 ﻿using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Providers.Contracts;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -9,7 +10,12 @@ namespace GameHubApi.Services
 {
     public class AIGameFilter : IGameFilter
     {
-        private readonly ILargeLanguageModel largeLanguageModel;
+        private const string Instructions =
+                  "You are a content moderator for a gaming platform. Your task is to evaluate whether a game is suitable for general platform inclusion." +
+                  "A game should be flagged as inappropriate only if it contains explicit or suggestive material that is primarily intended to provoke or appeal to adult-only interests, " +
+                  "especially in ways that are not central to gameplay or narrative.";
+        
+            private readonly ILargeLanguageModel largeLanguageModel;
 
         public AIGameFilter(ILargeLanguageModel largeLanguageModel)
         {
@@ -20,10 +26,9 @@ namespace GameHubApi.Services
         {
             var result = await this.largeLanguageModel.GenerateResponseAsync(new GenerateResponseQuery
             {
-                Instructions = "You are a content moderator for a gaming platform. Your task is to evaluate whether a game is suitable for general platform inclusion." +
-                               "A game should be flagged as inappropriate only if it contains explicit or suggestive material that is primarily intended to provoke or appeal to adult-only interests, especially in ways that are not central to gameplay or narrative." +
-                               "Respond with 'Blocked' if the game is not appropriate, otherwise respond with 'Passed'.",
-                Query = "Game information in Json format:\n" + JsonSerializer.Serialize(game)
+                Instructions = Instructions,
+                Query = "Respond with 'Blocked' if the game is not appropriate, otherwise respond with 'Passed'." +
+                        "Game information in Json format:\n" + JsonSerializer.Serialize(game)
             });
 
             return result.Message.Contains("Blocked") ? FilterResult.Blocked : FilterResult.Passed;
@@ -31,28 +36,31 @@ namespace GameHubApi.Services
 
         public async Task<IEnumerable<FilterResult>> FilterAsync(IEnumerable<Game> games)
         {
-            var result = await this.largeLanguageModel.GenerateResponseAsync(new GenerateResponseQuery
+            var gamesSummary = games.Select(g => new
             {
-                Instructions = "You are a content moderator for a gaming platform. Your task is to evaluate whether a game is suitable for general platform inclusion." +
-                               "A game should be flagged as inappropriate only if it contains explicit or suggestive material that is primarily intended to provoke or appeal to adult-only interests, especially in ways that are not central to gameplay or narrative." +
-                               "For each game, project either 'Blocked' if the game is not appropriate, otherwise project 'Passed'." +
-                               "Respond with a Json array of strings, with no additional decoration.",
-                Query = "Game list in Json format:\n" + JsonSerializer.Serialize(
-                    // Project only necessary fields to reduce token usage
-                    games.Select( g => new
-                    {
-                        g.Name,
-                        g.Description
-                    }))
+                g.Id,
+                g.Name,
+                g.Description
             });
 
-            var resultList = JsonSerializer.Deserialize<List<string>>(result.Message);
-            if (resultList == null || resultList.Count != games.Count())
+            var result = await this.largeLanguageModel.GenerateResponseAsync(new GenerateResponseQuery
+            {
+                Instructions = Instructions,
+                Query = "For each game, project an object {Id, FilterResult} where Id is the game ID and FilterResult is either 'Blocked' if the game is not appropriate, otherwise 'Passed'." +
+                        "Respond with an undecorated Json array of these objects." +
+                        "Game list in Json format:\n" + JsonSerializer.Serialize(gamesSummary)
+            });
+
+            // Define the anonymous type template
+            var template = new[] { new { Id = 1, FilterResult = "Passed" } } ;
+            var deserializedResult = JsonSerializer.Deserialize(result.Message, template.GetType());
+            var list = ((IEnumerable<object>)deserializedResult!).Cast<dynamic>().ToList();
+            if (list == null || list.Count != gamesSummary.Count())
             {
                 throw new InvalidOperationException("The response from the language model could not be parsed or does not match the number of games provided.");
             }
 
-            return resultList.Select(r => r.Contains("Blocked") ? FilterResult.Blocked : FilterResult.Passed);
+            return list.Select(r => r.FilterResult.Contains("Blocked") ? FilterResult.Blocked : FilterResult.Passed);
         }
     }
 }

@@ -49,11 +49,12 @@
                 LocalFilter = this.FilterLocal(g)
             }).ToList();
 
-            // For games that passed local filtering, apply AI filtering in batch request.
+            // For games that passed local filtering, apply AI filtering in a batch request.
             var aiFilterResult = (await this.aiGameFilter.FilterAsync(
                 localFilterResults.Where(lf => lf.LocalFilter == FilterResult.Passed)
                            .Select(lf => lf.Game))).ToList();
 
+            // Merge results, preserving order.
             var result = new List<FilterResult>();
             int aiIndex = 0;
             for (int i = 0; i< games.Count(); i++)
