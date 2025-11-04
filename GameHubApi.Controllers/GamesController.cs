@@ -1,5 +1,6 @@
 ﻿namespace GameHubApi.Controllers
 {
+    using GameHubApi.Contracts;
     using GameHubApi.Services;
     using GameHubApi.Services.Exceptions;
     using Microsoft.AspNetCore.Mvc;
@@ -139,6 +140,19 @@
                 this.logger.LogError(ex, "An error occurred while fetching scfreenshots in GetGameScreenshotsAsync.");
                 throw; // Re-throw the exception to ensure proper error handling
             }
+        }
+
+        [HttpPost("recommendations", Name = "GetGameRecommendations")]
+        public async Task<IActionResult> GetGameRecommendationsAsync([FromBody] GameRecommendationsRequest request)
+        {
+            this.logger.LogInformation("GetGameRecommendationsAsync called");
+            if (request == null)
+            {
+                this.logger.LogWarning("GetGameRecommendationsAsync called with an empty or null request.");
+                return BadRequest("Request cannot be null or empty.");
+            }
+
+            throw new NotImplementedException();
         }
     }
 }
