@@ -180,7 +180,8 @@
                         }
                         catch (ServiceException ex) when (
                             ex.ResultCode == ServiceResultCode.NotFound ||
-                            ex.ResultCode == ServiceResultCode.Forbidden)
+                            ex.ResultCode == ServiceResultCode.Forbidden || 
+                            ex.ResultCode == ServiceResultCode.InternalServerError)
                         {
                             return null;
                         }
