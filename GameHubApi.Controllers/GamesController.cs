@@ -152,22 +152,17 @@
                 return BadRequest("Request cannot be null or empty.");
             }
 
-            return Ok(new CollectionResult<Game> {
-                Count = 2,
-                Next = null,
-                Previous = null,
-                Results = new List<Game>() 
-                { 
-                    new Game() 
-                    { 
-                        Id = 1, Slug="tetris", Name = "Tetris" 
-                    },
-                    new Game()
-                    {
-                        Id = 2, Slug="super-mario-bros", Name = "Super Mario Bros"
-                    }
-                }
-            });
+            try
+            {
+                var result = await gamesService.GetGameRecommendationsAsync(request);
+                this.logger.LogInformation("GetGameRecommendationsAsync successfully fetched {Count} recommendations.", result.Count);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching game recommendations in GetGameRecommendationsAsync.");
+                throw; // Re-throw the exception to ensure proper error handling
+            }
         }
     }
 }

@@ -7,5 +7,6 @@
         Task<Game> GetGameAsync(string gameId, string? language);
         Task<CollectionResult<Movie>> GetMovies(string gameId);
         Task<CollectionResult<Screenshot>> GetScreenshots(string gameId);
+        Task<CollectionResult<Game>> GetGameRecommendationsAsync(GameRecommendationsRequest request);
     }
 }
