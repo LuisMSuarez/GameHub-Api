@@ -152,10 +152,11 @@
                 Query = "List of games the user likes:\n" + JsonSerializer.Serialize(request.LikedGames) +
                         "\nList of games the user dislikes:\n" + JsonSerializer.Serialize(request.DislikedGames)
             });
-            
+
+            List<RecommendedGame>? recommendedGames = null;
             try
-            {   // Try to parse the response to ensure it's valid JSON
-                JsonDocument.Parse(result.Message);
+            {
+                recommendedGames = JsonSerializer.Deserialize<List<RecommendedGame>>(result.Message);
             }
             catch (JsonException ex)
             {
@@ -165,9 +166,7 @@
                     ServiceResultCode.InternalServerError,
                     "Failed to parse AI recommendation response as JSON.", ex);
             }
-            
-            var recommendedGames = JsonSerializer.Deserialize<List<RecommendedGame>>(result.Message);
-            
+
             // Hydrate the recommended games with full game details
             // We requested 10 recommendations, but we may get less after filtering out not found or forbidden games,
             // so we take up to 5 valid games to return
