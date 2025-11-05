@@ -152,7 +152,17 @@
                 return BadRequest("Request cannot be null or empty.");
             }
 
-            throw new NotImplementedException();
+            try
+            {
+                var result = await gamesService.GetGameRecommendationsAsync(request);
+                this.logger.LogInformation("GetGameRecommendationsAsync successfully fetched {Count} recommendations.", result.Count);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "An error occurred while fetching game recommendations in GetGameRecommendationsAsync.");
+                throw; // Re-throw the exception to ensure proper error handling
+            }
         }
     }
 }
