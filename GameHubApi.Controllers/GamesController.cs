@@ -152,7 +152,22 @@
                 return BadRequest("Request cannot be null or empty.");
             }
 
-            throw new NotImplementedException();
+            return Ok(new CollectionResult<Game> {
+                Count = 2,
+                Next = null,
+                Previous = null,
+                Results = new List<Game>() 
+                { 
+                    new Game() 
+                    { 
+                        Id = 1, Slug="tetris", Name = "Tetris" 
+                    },
+                    new Game()
+                    {
+                        Id = 2, Slug="super-mario-bros", Name = "Super Mario Bros"
+                    }
+                }
+            });
         }
     }
 }
