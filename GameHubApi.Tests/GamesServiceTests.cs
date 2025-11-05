@@ -3,6 +3,7 @@
     using GameHubApi.Contracts;
     using GameHubApi.Providers;
     using GameHubApi.Services;
+    using Microsoft.Extensions.Logging;
     using Moq;
 
     public class GamesServiceTests
@@ -17,7 +18,7 @@
                 .Setup(api => api.GetGamesAsync("action", "pc", "name", "search", 1, 20))
                 .ReturnsAsync(expectedResult);
 
-            var gamesService = new GamesService(mockRawgApi.Object, Mock.Of<IGameFilter>(), Mock.Of<ITranslator>());
+            var gamesService = new GamesService(mockRawgApi.Object, Mock.Of<IGameFilter>(), Mock.Of<ITranslator>(), Mock.Of<ILargeLanguageModel>(), Mock.Of<ILogger<GamesService>>());
 
             // Act
             var result = await gamesService.GetGamesAsync("action", "pc", "name", "search", 1, 20);
@@ -51,9 +52,8 @@
             mockGameFilter
                 .Setup(filter => filter.FilterAsync(It.Is<Game>(g => g.Name.Equals("Game 2"))))
                 .ReturnsAsync(FilterResult.Blocked);
-            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>());
+            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>(), Mock.Of<ILargeLanguageModel>(), Mock.Of<ILogger<GamesService>>());
 
-            // Act
             var result = await gamesService.GetGamesAsync("action", "pc", "name", "search", 1, 20);
 
             // Assert
@@ -72,7 +72,7 @@
                 .Setup(api => api.GetGamesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
                 .ThrowsAsync(new InvalidOperationException("API error"));
 
-            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>());
+            var gamesService = new GamesService(mockRawgApi.Object, mockGameFilter.Object, Mock.Of<ITranslator>(), Mock.Of<ILargeLanguageModel>(), Mock.Of<ILogger<GamesService>>());
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
