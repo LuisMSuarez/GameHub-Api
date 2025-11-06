@@ -141,6 +141,10 @@
 
         public async Task<CollectionResult<Game>> GetGameRecommendationsAsync(GameRecommendationsRequest request)
         {
+            // create stripped-down versions of the liked/disliked games to send to the LLM to save on token usage
+            var likedGames = request.LikedGames.Select(g => new { Name = g.Name, ParentPlatforms = g.ParentPlatforms, Genres = g.Genres, Tags = g.Tags, Publishers = g.Publishers });
+            var dislikedGames = request.DislikedGames.Select(g => new { Name = g.Name, ParentPlatforms = g.ParentPlatforms, Genres = g.Genres, Tags = g.Tags, Publishers = g.Publishers });
+
             var result = await this.largeLanguageModel.GenerateResponseAsync(new GenerateResponseQuery
             {
                 Instructions = @"You are a game recommendation engine, based on the RAWG api game catalog.
@@ -149,8 +153,8 @@
                                  where the first item is the most relevant.
                                  Your reply will be in raw JSON format, no markdown or code blocks, with an array of objects with this schema.
                                  [{ ""name"": ""Grand Theft Auto V"", ""slug"": ""grand-theft-auto-v"" }]",
-                Query = "List of games the user likes:\n" + JsonSerializer.Serialize(request.LikedGames) +
-                        "\nList of games the user dislikes:\n" + JsonSerializer.Serialize(request.DislikedGames)
+                Query = "List of games the user likes:\n" + JsonSerializer.Serialize(likedGames) +
+                        "\nList of games the user dislikes:\n" + JsonSerializer.Serialize(dislikedGames)
             });
 
             List<RecommendedGame>? recommendedGames = null;
