@@ -10,7 +10,6 @@
     using System.Text.Json;
     using System.Web;
 
-
     public class RawgApi : IRawgApi
     {
         private readonly HttpClient httpClient;
@@ -72,14 +71,25 @@
             return result;
         }
 
-        public Task<Game> GetGameAsync(string id)
+        public async Task<Game> GetGameAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 throw new ArgumentException("Id cannot be null or empty.", nameof(id));
             }
             var url = $"{BaseUrl}/games/{Uri.EscapeDataString(id)}?key={apiKey}";
-            return GetAsync<Game>(url);
+            var rawgGame = await GetAsync<RawgApiEntities.Game>(url);
+
+            // Scenario: AI returns a game slug that redirects to another game
+            // In this case, we need to follow the redirect to get the actual game details.
+            if (rawgGame.Redirect.HasValue &&
+                rawgGame.Redirect.Value &&
+                !string.IsNullOrWhiteSpace(rawgGame.Slug))
+            {
+                return await GetGameAsync(rawgGame.Slug!);
+            }
+
+            return rawgGame.ToContract();
         }
 
         public async Task<CollectionResult<Movie>> GetMovies(string gameId)
@@ -124,6 +134,7 @@
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<T>(content);
+
             if (result == null)
             {
                 throw new ProviderException(
