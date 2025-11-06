@@ -123,7 +123,20 @@
             }
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<T>(content);
+            T? result = default;
+            try
+            {
+                result = JsonSerializer.Deserialize<T>(content);
+            }
+            catch (JsonException ex)
+            {
+                var redirect = JsonSerializer.Deserialize<RawgRedirectResult>(content);
+                if (redirect != null && redirect.Redirect)
+                {
+                    // handle redirect
+                }
+            }
+
             if (result == null)
             {
                 throw new ProviderException(
