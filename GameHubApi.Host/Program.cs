@@ -18,7 +18,7 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-    // cors policy to only allow GET requests from allow-list origins
+    // cors policy
     options.AddPolicy("SpecificOrigins", policy =>
     {
         policy
@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
                 "http://localhost:5174",
                 "https://gamers-hub.azurewebsites.net",
                 "https://gamers-hub-cnt.azurewebsites.net") // allowed origins
-            .WithMethods("GET", "POST") // Only allow GET 
+            .WithMethods("GET", "POST")
             .AllowAnyHeader();
     });
 });
