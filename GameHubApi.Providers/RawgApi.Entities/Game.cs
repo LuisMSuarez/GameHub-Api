@@ -65,7 +65,7 @@ namespace GameHubApi.Providers.RawgApiEntities
                 Slug = this.Slug!,
                 BackgroundImage = this.BackgroundImage,
                 Rating = this.Rating ?? 0,
-                Metacritic = this.Metacritic ?? 0,
+                Metacritic = this.Metacritic,
                 RatingTop = this.RatingTop ?? 0,
                 ParentPlatforms = this.ParentPlatforms,
                 Tags = this.Tags,
