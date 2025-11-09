@@ -1,11 +1,16 @@
 ﻿namespace GameHubApi.Controllers
 {
+    // Importing necessary namespaces for contracts, services, logging, and web API functionality
     using GameHubApi.Contracts;
     using GameHubApi.Services;
     using GameHubApi.Services.Exceptions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
 
+    /// <summary>
+    /// Handles HTTP requests related to game data in the GameHub API.
+    /// Provides endpoints for listing games, retrieving details, media assets, and recommendations.
+    /// </summary>
     [Route("v1/[controller]")]
     [ApiController]
     public class GamesController : ControllerBase
@@ -13,12 +18,20 @@
         private readonly IGamesService gamesService;
         private readonly ILogger<GamesController> logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GamesController"/> class.
+        /// </summary>
+        /// <param name="logger">Logger for diagnostics and telemetry.</param>
+        /// <param name="gamesService">Service layer for game-related operations.</param>
         public GamesController(ILogger<GamesController> logger, IGamesService gamesService)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.gamesService = gamesService ?? throw new ArgumentNullException(nameof(gamesService));
         }
 
+        /// <summary>
+        /// Retrieves a paginated list of games with optional filters.
+        /// </summary>
         [HttpGet(Name = "GetGames")]
         public async Task<IActionResult> GetGamesAsync(
             [FromQuery(Name = "genres")] string? genres,
@@ -27,7 +40,7 @@
             [FromQuery(Name = "search")] string? search,
             [FromQuery(Name = "page")] int page = 1,
             [FromQuery(Name = "page_size")] int pageSize = 20
-            )
+        )
         {
             this.logger.LogInformation("GetGamesAsync called to fetch games.");
 
@@ -45,19 +58,24 @@
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "An error occurred while fetching games in GetGamesAsync.");
-                throw; // Re-throw the exception to ensure proper error handling
+                throw;
             }
         }
 
+        /// <summary>
+        /// Retrieves detailed information about a specific game by ID.
+        /// </summary>
         [HttpGet("{id}", Name = "GetGameDetails")]
         public async Task<IActionResult> GetGameDetailsAsync(string id, [FromQuery] string? language)
         {
             this.logger.LogInformation("GetGameAsync called for id: {id}", id);
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 this.logger.LogWarning("GetGameAsync called with an empty or null id.");
                 return BadRequest("Id cannot be null or empty.");
             }
+
             try
             {
                 var game = await gamesService.GetGameAsync(id, language);
@@ -66,6 +84,7 @@
                     this.logger.LogWarning("Game with id {Id} not found.", id);
                     return NotFound();
                 }
+
                 this.logger.LogInformation("GetGameAsync successfully fetched game with id: {Id}", id);
                 return Ok(game);
             }
@@ -82,14 +101,18 @@
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "An error occurred while fetching the game in GetGameAsync for id: {Id}", id);
-                throw; // Re-throw the exception to ensure proper error handling
+                throw;
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of movies associated with a specific game.
+        /// </summary>
         [HttpGet("{id}/movies", Name = "GetGameMovies")]
         public async Task<IActionResult> GetGameMoviesAsync(string id)
         {
             this.logger.LogInformation("GetGameMoviesAsync called for id: {id}", id);
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 this.logger.LogWarning("GetGameMoviesAsync called with an empty or null id.");
@@ -110,14 +133,18 @@
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "An error occurred while fetching movies in GetGameMoviesAsync.");
-                throw; // Re-throw the exception to ensure proper error handling
+                throw;
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of screenshots associated with a specific game.
+        /// </summary>
         [HttpGet("{id}/screenshots", Name = "GetGameScreenshots")]
         public async Task<IActionResult> GetGameScreenshotsAsync(string id)
         {
             this.logger.LogInformation("GetGameScreenshotsAsync called for id: {id}", id);
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 this.logger.LogWarning("GetGameScreenshotsAsync called with an empty or null id.");
@@ -137,15 +164,19 @@
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "An error occurred while fetching scfreenshots in GetGameScreenshotsAsync.");
-                throw; // Re-throw the exception to ensure proper error handling
+                this.logger.LogError(ex, "An error occurred while fetching screenshots in GetGameScreenshotsAsync.");
+                throw;
             }
         }
 
+        /// <summary>
+        /// Generates personalized game recommendations based on liked and disliked games.
+        /// </summary>
         [HttpPost("recommendations", Name = "GetGameRecommendations")]
         public async Task<IActionResult> GetGameRecommendationsAsync([FromBody] GameRecommendationsRequest request)
         {
             this.logger.LogInformation("GetGameRecommendationsAsync called");
+
             if (request == null)
             {
                 this.logger.LogWarning("GetGameRecommendationsAsync called with an empty or null request.");
@@ -161,7 +192,7 @@
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "An error occurred while fetching game recommendations in GetGameRecommendationsAsync.");
-                throw; // Re-throw the exception to ensure proper error handling
+                throw;
             }
         }
     }
