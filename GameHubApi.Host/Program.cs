@@ -3,11 +3,14 @@ using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Services;
 using OpenAI.Chat;
+
 var builder = WebApplication.CreateBuilder(args);
 
+// Retrieve Key Vault endpoint from environment variable
 var keyVaultVariable = Environment.GetEnvironmentVariable("SERVICE_KEYVAULT");
 if (string.IsNullOrWhiteSpace(keyVaultVariable))
 {
+    // Fail fast if Key Vault URL is missing
     throw new InvalidOperationException("Key Vault URL is not set in the environment variables.");
 }
 
@@ -32,8 +35,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add services to the container.
+// Add MVC controller support
 builder.Services.AddControllers();
+
+// Register core service dependencies
 builder.Services.AddScoped<IGamesService, GamesService>();
 builder.Services.AddScoped<IGenresService, GenresService>();
 builder.Services.AddScoped<ITranslator, AzureTranslatorApi>();
@@ -55,6 +60,7 @@ builder.Services.AddScoped<Func<string, IGameFilter>>(serviceProvider => key =>
     };
 });
 
+// Register OpenAI ChatClient using API key from Key Vault
 builder.Services.AddSingleton(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();
@@ -113,16 +119,24 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Apply CORS policy to incoming requests
 app.UseCors("SpecificOrigins");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Enable Swagger UI in development for API exploration
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Enforce HTTPS and authorization middleware
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+// Map controller routes
 app.MapControllers();
+
+// Start the application
 app.Run();
