@@ -8,6 +8,9 @@
     using Microsoft.Extensions.Logging;
     using System.Text.Json;
 
+    /// <summary>
+    /// Provides game-related operations including retrieval, filtering, translation, and AI-powered recommendations.
+    /// </summary>
     public class GamesService : IGamesService
     {
         private readonly IRawgApi rawgApi;
@@ -16,6 +19,14 @@
         private readonly ILargeLanguageModel largeLanguageModel;
         private readonly ILogger<GamesService> logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GamesService"/> class.
+        /// </summary>
+        /// <param name="rawgApi">The RAWG API provider.</param>
+        /// <param name="gameFilter">The game filter used to evaluate content suitability.</param>
+        /// <param name="translator">The translator service for localizing game descriptions.</param>
+        /// <param name="largeLanguageModel">The AI model used for generating recommendations.</param>
+        /// <param name="logger">Logger for diagnostics and error tracking.</param>
         public GamesService(
             IRawgApi rawgApi,
             IGameFilter gameFilter,
@@ -30,6 +41,7 @@
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc />
         public async Task<CollectionResult<Game>> GetGamesAsync(string? genres, string? parentPlatforms, string? ordering, string? search, int page, int pageSize)
         {
             var getGamesResult = await this.rawgApi.GetGamesAsync(genres, parentPlatforms, ordering, search, page, pageSize);
@@ -48,6 +60,7 @@
             };
         }
 
+        /// <inheritdoc />
         public async Task<Game> GetGameAsync(string gameId, string? language)
         {
             if (string.IsNullOrWhiteSpace(gameId))
@@ -62,43 +75,35 @@
             }
             catch (ProviderException ex) when (ex.ResultCode == ProviderResultCode.NotFound)
             {
-                throw new ServiceException(
-                    ServiceResultCode.NotFound,
-                    "Game not found.", ex);
+                throw new ServiceException(ServiceResultCode.NotFound, "Game not found.", ex);
             }
             catch (Exception ex)
             {
-                throw new ServiceException(
-                    ServiceResultCode.InternalServerError,
-                    "An error occurred while fetching the game details.", ex);
+                throw new ServiceException(ServiceResultCode.InternalServerError, "An error occurred while fetching the game details.", ex);
             }
 
             if (game == null)
             {
-                throw new ServiceException(
-                    ServiceResultCode.NotFound,
-                    "Game not found.");
+                throw new ServiceException(ServiceResultCode.NotFound, "Game not found.");
             }
 
             if (await this.gameFilter.FilterAsync(game) != FilterResult.Passed)
             {
-                throw new ServiceException(
-                    ServiceResultCode.Forbidden,
-                    "The requested game does not pass the filter criteria.");
+                throw new ServiceException(ServiceResultCode.Forbidden, "The requested game does not pass the filter criteria.");
             }
 
             if (!string.IsNullOrWhiteSpace(language) && !string.IsNullOrWhiteSpace(game.Description))
             {
                 var translation = await this.translator.Translate(game.Description, null, language);
-                
-                // we need to clone the game object to avoid modifying the original which is in the cache, given that it is a reference object
                 var clonedGame = game.Clone() as Game ?? throw new InvalidOperationException("Failed to clone the game object.");
                 clonedGame.Description = translation;
                 return clonedGame;
             }
+
             return game;
         }
 
+        /// <inheritdoc />
         public async Task<CollectionResult<Movie>> GetMovies(string gameId)
         {
             try
@@ -107,18 +112,15 @@
             }
             catch (ProviderException ex) when (ex.ResultCode == ProviderResultCode.NotFound)
             {
-                throw new ServiceException(
-                    ServiceResultCode.NotFound,
-                    "Movies not found for the specified game.", ex);
+                throw new ServiceException(ServiceResultCode.NotFound, "Movies not found for the specified game.", ex);
             }
             catch (Exception ex)
             {
-                throw new ServiceException(
-                    ServiceResultCode.InternalServerError,
-                    "An error occurred while fetching the movies.", ex);
+                throw new ServiceException(ServiceResultCode.InternalServerError, "An error occurred while fetching the movies.", ex);
             }
         }
 
+        /// <inheritdoc />
         public async Task<CollectionResult<Screenshot>> GetScreenshots(string gameId)
         {
             try
@@ -127,23 +129,19 @@
             }
             catch (ProviderException ex) when (ex.ResultCode == ProviderResultCode.NotFound)
             {
-                throw new ServiceException(
-                    ServiceResultCode.NotFound,
-                    "Screenshots not found for the specified game.", ex);
+                throw new ServiceException(ServiceResultCode.NotFound, "Screenshots not found for the specified game.", ex);
             }
             catch (Exception ex)
             {
-                throw new ServiceException(
-                    ServiceResultCode.InternalServerError,
-                    "An error occurred while fetching the screenshots.", ex);
+                throw new ServiceException(ServiceResultCode.InternalServerError, "An error occurred while fetching the screenshots.", ex);
             }
         }
 
+        /// <inheritdoc />
         public async Task<CollectionResult<Game>> GetGameRecommendationsAsync(GameRecommendationsRequest request)
         {
-            // create stripped-down versions of the liked/disliked games to send to the LLM to save on token usage
-            var likedGames = request.LikedGames.Select(g => new { Name = g.Name, ParentPlatforms = g.ParentPlatforms, Genres = g.Genres, Tags = g.Tags, Publishers = g.Publishers });
-            var dislikedGames = request.DislikedGames.Select(g => new { Name = g.Name, ParentPlatforms = g.ParentPlatforms, Genres = g.Genres, Tags = g.Tags, Publishers = g.Publishers });
+            var likedGames = request.LikedGames.Select(g => new { g.Name, g.ParentPlatforms, g.Genres, g.Tags, g.Publishers });
+            var dislikedGames = request.DislikedGames.Select(g => new { g.Name, g.ParentPlatforms, g.Genres, g.Tags, g.Publishers });
 
             var result = await this.largeLanguageModel.GenerateResponseAsync(new GenerateResponseQuery
             {
@@ -166,31 +164,26 @@
             {
                 this.logger.LogError(ex, "Failed to parse AI recommendation response as JSON.");
                 this.logger.LogError("AI Recommendation Response: {Response}", result.Message);
-                throw new ServiceException(
-                    ServiceResultCode.InternalServerError,
-                    "Failed to parse AI recommendation response as JSON.", ex);
+                throw new ServiceException(ServiceResultCode.InternalServerError, "Failed to parse AI recommendation response as JSON.", ex);
             }
 
-            // Hydrate the recommended games with full game details
-            // We requested 10 recommendations, but we may get less after filtering out not found or forbidden games,
-            // so we take up to 5 valid games to return
             var hydratedRecommendations = recommendedGames != null
-                    ? (await Task.WhenAll(recommendedGames.Select(async rg =>
+                ? (await Task.WhenAll(recommendedGames.Select(async rg =>
+                {
+                    try
                     {
-                        try
-                        {
-                            var game = await this.GetGameAsync(rg.Slug, null);
-                            return game;
-                        }
-                        catch (ServiceException ex) when (
-                            ex.ResultCode == ServiceResultCode.NotFound ||
-                            ex.ResultCode == ServiceResultCode.Forbidden || 
-                            ex.ResultCode == ServiceResultCode.InternalServerError)
-                        {
-                            return null;
-                        }
-                    }))).Where(g => g != null).Take(5).ToList()!
-                    : new List<Game>();
+                        var game = await this.GetGameAsync(rg.Slug, null);
+                        return game;
+                    }
+                    catch (ServiceException ex) when (
+                        ex.ResultCode == ServiceResultCode.NotFound ||
+                        ex.ResultCode == ServiceResultCode.Forbidden ||
+                        ex.ResultCode == ServiceResultCode.InternalServerError)
+                    {
+                        return null;
+                    }
+                }))).Where(g => g != null).Take(5).ToList()!
+                : new List<Game>();
 
             return new CollectionResult<Game>
             {
