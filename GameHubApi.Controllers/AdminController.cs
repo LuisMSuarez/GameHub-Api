@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -6,7 +7,7 @@ namespace GameHubApi.Controllers
 {
     [ApiController]
     [Route("v1/[controller]")]
-    [Authorize(AuthenticationSchemes = "Microsoft")]
+    [Authorize(AuthenticationSchemes = "Microsoft,Bearer")]
     public class AdminController : ControllerBase
     {
         [HttpGet("test")]

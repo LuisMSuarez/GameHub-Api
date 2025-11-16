@@ -4,6 +4,8 @@ using GameHubApi.Providers;
 using GameHubApi.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using OpenAI.Chat;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,8 +56,19 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("email");
     options.Scope.Add("profile");
     options.CallbackPath = "/signin-oidc";
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.Authority = "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0";
+    options.Audience = "api://739fc281-af8d-42f7-ac40-9cb0601ec826";
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = false,
+        ValidateIssuerSigningKey = true
+    };
 });
-
 
 // Add MVC controller support
 builder.Services.AddControllers();
