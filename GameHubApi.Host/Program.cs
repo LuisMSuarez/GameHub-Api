@@ -60,7 +60,7 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
     options.Authority = "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0";
-    options.Audience = "739fc281-af8d-42f7-ac40-9cb0601ec826";
+    options.Audience = builder.Configuration["ClientId"];
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
