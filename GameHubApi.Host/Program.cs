@@ -2,6 +2,7 @@ using Azure.Identity;
 using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using OpenAI.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,27 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = "Microsoft";
+})
+.AddCookie()
+.AddOpenIdConnect("Microsoft", options =>
+{
+    options.ClientId = builder.Configuration["ClientId"];
+    options.ClientSecret = builder.Configuration["ClientSecret"];
+
+    // MSAL treats the Microsoft account system (Live, MSA) as another tenant within the Microsoft identity platform. The tenant id of the Microsoft account tenant is: 9188040d-6c67-4c5b-b112-36a304b66dad
+    options.Authority = "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0";
+    options.ResponseType = "code";
+    options.SaveTokens = true;
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+    options.CallbackPath = "/signin-oidc";
+});
+
 
 // Add MVC controller support
 builder.Services.AddControllers();
@@ -133,6 +155,7 @@ if (app.Environment.IsDevelopment())
 
 // Enforce HTTPS and authorization middleware
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Map controller routes
