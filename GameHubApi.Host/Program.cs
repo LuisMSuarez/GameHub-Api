@@ -70,6 +70,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Custom policy that allows either Microsoft authentication or Bearer token authentication
+// Convenient for both web app users and API clients
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MicrosoftOrBearer", policy =>
+    {
+        policy.AddAuthenticationSchemes("Microsoft", JwtBearerDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+    });
+});
+
+
 // Add MVC controller support
 builder.Services.AddControllers();
 

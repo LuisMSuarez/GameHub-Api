@@ -7,7 +7,7 @@ namespace GameHubApi.Controllers
 {
     [ApiController]
     [Route("v1/[controller]")]
-    [Authorize(AuthenticationSchemes = "Microsoft,Bearer")]
+    [Authorize(Policy = "MicrosoftOrBearer")]
     public class AdminController : ControllerBase
     {
         [HttpGet("test")]
