@@ -3,9 +3,10 @@ using GameHubApi.Contracts;
 using GameHubApi.Providers;
 using GameHubApi.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using OpenAI.Chat;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using OpenAI.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,10 +42,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = "Microsoft";
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 })
 .AddCookie()
-.AddOpenIdConnect("Microsoft", options =>
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
     options.ClientId = builder.Configuration["ClientId"];
     options.ClientSecret = builder.Configuration["ClientSecret"];
@@ -74,13 +75,12 @@ builder.Services.AddAuthentication(options =>
 // Convenient for both web app users and API clients
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("MicrosoftOrBearer", policy =>
+    options.AddPolicy("CookiesAndBearer", policy =>
     {
-        policy.AddAuthenticationSchemes("Microsoft", JwtBearerDefaults.AuthenticationScheme);
+        policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme, JwtBearerDefaults.AuthenticationScheme);
         policy.RequireAuthenticatedUser();
     });
 });
-
 
 // Add MVC controller support
 builder.Services.AddControllers();
