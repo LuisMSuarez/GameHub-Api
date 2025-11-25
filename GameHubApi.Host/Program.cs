@@ -5,8 +5,12 @@ using GameHubApi.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenAI.Chat;
+using GameHubApi.Repository.Contracts;
+using GameHubApi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,6 +118,21 @@ builder.Services.AddSingleton(provider =>
     var apiKey = config["OpenAIKey"];
     return new ChatClient(model: "gpt-4o-mini", apiKey: apiKey);
 });
+
+builder.Services.AddSingleton<CosmosClient>((serviceProvider) =>
+{
+    var config = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = config["CosmosDbEndpoint"];
+
+    CosmosClient client = new(
+        connectionString: connectionString
+    );
+    return client;
+});
+
+// Registering the repository as singleton for better performance, provided this is safe for CosmosDb
+builder.Services.AddSingleton<IUserGameRepository, CosmosDbUserGameRepository>();
+
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
