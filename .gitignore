@@ -27,3 +27,5 @@ GameHubApi/GameHubApi.csproj.user
 /GameHubApi.Host/Properties/PublishProfiles
 GameHubApi.Host/GameHubApi.Host.csproj.user
 /GameHubApi.Host/Properties
+/GameHubApi.Repository/bin
+/GameHubApi.Repository/obj
