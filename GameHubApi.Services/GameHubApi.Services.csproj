@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameHubApi.Providers\GameHubApi.Providers.csproj" />
+    <ProjectReference Include="..\GameHubApi.Repository\GameHubApi.Repository.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 
 namespace GameHubApi.Repository
 {
-    public class UserGamesRepository : IUserGamesRepository
+    public class UserGameRepository : IUserGameRepository
     {
         public Task<UserGame> CreateOrUpdateUserGamePreference(string userid, string gameId, Preference preference)
         {
