@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenAI.Chat;
 using GameHubApi.Repository.Contracts;
+using GameHubApi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,14 +121,18 @@ builder.Services.AddSingleton(provider =>
 
 builder.Services.AddSingleton<CosmosClient>((serviceProvider) =>
 {
-    IOptions<CosmosDbConfiguration> configurationOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbConfiguration>>();
-    var configuration = configurationOptions.Value;
+    var config = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = config["CosmosDbEndpoint"];
 
     CosmosClient client = new(
-        connectionString: configuration.AzureCosmosDB.ConnectionString
+        connectionString: connectionString
     );
     return client;
 });
+
+// Registering the repository as singleton for better performance, provided this is safe for CosmosDb
+builder.Services.AddSingleton<IUserGameRepository, CosmosDbUserGameRepository>();
+
 
 // Register HttpClient for use by Providers
 builder.Services.AddHttpClient();
