@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GameHubApi.Repository.Contracts
+namespace GameHubApi.Contracts
 {
     public class UserGame
     {
@@ -8,6 +8,6 @@ namespace GameHubApi.Repository.Contracts
         public required string GameId { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Preference Preference { get; set; } 
+        public Preference Preference { get; set; }
     }
 }
