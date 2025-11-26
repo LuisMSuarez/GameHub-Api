@@ -1,4 +1,4 @@
-﻿using GameHubApi.Repository.Contracts;
+﻿using GameHubApi.Contracts;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 

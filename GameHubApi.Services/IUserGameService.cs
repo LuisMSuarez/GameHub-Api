@@ -1,8 +1,8 @@
 ﻿using GameHubApi.Contracts;
 
-namespace GameHubApi.Repository
+namespace GameHubApi.Services
 {
-    public interface IUserGameRepository
+    public interface IUserGameService
     {
         Task<UserGame> CreateOrUpdateUserGamePreference(string userid, string gameId, Preference preference);
     }
