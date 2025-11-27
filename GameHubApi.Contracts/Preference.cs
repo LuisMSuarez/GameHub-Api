@@ -3,6 +3,7 @@
     [Flags]
     public enum Preference
     {
+        None,
         Like,
         Dislike,
         Owned,

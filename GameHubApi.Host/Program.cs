@@ -92,6 +92,7 @@ builder.Services.AddControllers();
 // Register core service dependencies
 builder.Services.AddScoped<IGamesService, GamesService>();
 builder.Services.AddScoped<IGenresService, GenresService>();
+builder.Services.AddScoped<IUserGameService, UserGameService>();
 builder.Services.AddScoped<ITranslator, AzureTranslatorApi>();
 builder.Services.AddScoped<ILargeLanguageModel, OpenAILargeLanguageModel>();
 
@@ -122,7 +123,7 @@ builder.Services.AddSingleton(provider =>
 builder.Services.AddSingleton<CosmosClient>((serviceProvider) =>
 {
     var config = serviceProvider.GetRequiredService<IConfiguration>();
-    var connectionString = config["CosmosDbEndpoint"];
+    var connectionString = config["CosmosDbConnectionString"];
 
     CosmosClient client = new(
         connectionString: connectionString
