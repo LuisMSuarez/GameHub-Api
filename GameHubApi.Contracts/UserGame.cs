@@ -8,6 +8,6 @@ namespace GameHubApi.Contracts
         public required string GameId { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Preference Preference { get; set; }
+        public Preference Preferences { get; set; }
     }
 }

@@ -11,8 +11,8 @@ namespace GameHubApi.Repository.Contracts
         [JsonProperty("gameId")]
         public required string GameId { get; set; }
 
-        [JsonProperty("preference")]
+        [JsonProperty("preferences")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public Preference Preference { get; set; } 
+        public Preference Preferences { get; set; } 
     }
 }

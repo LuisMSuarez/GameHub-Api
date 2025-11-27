@@ -99,7 +99,7 @@ namespace GameHubApi.Repository
             {
                 GameId = resource.GameId,
                 UserId = resource.UserId,
-                Preference = (GameHubApi.Contracts.Preference)resource.Preference
+                Preferences = (GameHubApi.Contracts.Preference)resource.Preferences
             };
         }
     }
