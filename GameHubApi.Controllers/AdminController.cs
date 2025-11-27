@@ -20,10 +20,9 @@ namespace GameHubApi.Controllers
         // They will not trigger the authentication process.
         public IActionResult Login()
         {
-            var user = HttpContext.User;
-            var name = user.FindFirst("name")?.Value;
-            var email = user.FindFirst("preferred_username")?.Value;
-            var objectId = user.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+            var name = User.FindFirst("name")?.Value;
+            var email = User.FindFirst("preferred_username")?.Value;
+            var objectId = User.GetObjectId();
             return Ok(new
             {
                 name,
