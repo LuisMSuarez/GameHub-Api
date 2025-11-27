@@ -8,12 +8,17 @@ using System.Threading.Tasks;
 
 namespace GameHubApi.Services
 {
-    internal class UserGameService : IUserGameService
+    public class UserGameService : IUserGameService
     {
         private readonly IUserGameRepository repository;
         public UserGameService(IUserGameRepository repository)
         {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        }
+
+        public Task<UserGame?> GetUserGame(string id, string userId)
+        {
+            return this.repository.GetUserGame(id, userId);
         }
 
         public Task<UserGame> CreateOrUpdateUserGamePreference(string userid, string gameId, Preference preference)

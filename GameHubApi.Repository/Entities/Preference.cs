@@ -3,6 +3,7 @@
     [Flags]
     internal enum Preference
     {
+        None,
         Like,
         Dislike,
         Owned,
