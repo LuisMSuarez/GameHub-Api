@@ -53,6 +53,41 @@ namespace GameHubApi.Repository
             }
         }
 
+        public async Task<CollectionResult<GameHubApi.Contracts.UserGame>> GetUserGames(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserId is null or empty.");
+            }
+
+            try
+            {
+                var query = new QueryDefinition("SELECT * FROM c");
+                var options = new QueryRequestOptions { PartitionKey = new PartitionKey(userId) };
+
+                var response = await this.container.GetItemQueryIterator<GameHubApi.Repository.Contracts.UserGame>(
+                    query, requestOptions: options).ReadNextAsync();
+
+                var results = response.Resource.ToList().Select( r => ToUserGameContract(r));
+                return new CollectionResult<GameHubApi.Contracts.UserGame>
+                {
+                    Count = results.Count(),
+                    Results = results.ToList()
+                };
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new CollectionResult<GameHubApi.Contracts.UserGame>
+                {
+                    Count = 0
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error fetching url shortcut.", ex);
+            }
+        }
+
         public Task<GameHubApi.Contracts.UserGame> CreateOrUpdateUserGamePreference(string userId, string gameId, GameHubApi.Contracts.Preference preference)
         {
             throw new NotImplementedException();

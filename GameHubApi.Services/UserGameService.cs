@@ -21,6 +21,11 @@ namespace GameHubApi.Services
             return this.repository.GetUserGame(id, userId);
         }
 
+        public Task<CollectionResult<UserGame>> GetUserGames(string userId)
+        {
+            return this.repository.GetUserGames(userId);
+        }
+
         public Task<UserGame> CreateOrUpdateUserGamePreference(string userid, string gameId, Preference preference)
         {
             return this.repository.CreateOrUpdateUserGamePreference(userid, gameId, preference);
