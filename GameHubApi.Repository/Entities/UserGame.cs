@@ -5,14 +5,17 @@ namespace GameHubApi.Repository.Contracts
 {
     internal class UserGame
     {
+        [JsonProperty("id")]
+        public required string Id { get; set; }
+
         [JsonProperty("userId")]
         public required string UserId { get; set; }
 
         [JsonProperty("gameId")]
         public required string GameId { get; set; }
 
-        [JsonProperty("preference")]
+        [JsonProperty("preferences")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public Preference Preference { get; set; } 
+        public Preference Preferences { get; set; } 
     }
 }

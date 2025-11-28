@@ -97,9 +97,10 @@ namespace GameHubApi.Repository
         {
             return new GameHubApi.Contracts.UserGame
             {
+                Id = resource.Id,
                 GameId = resource.GameId,
                 UserId = resource.UserId,
-                Preference = (GameHubApi.Contracts.Preference)resource.Preference
+                Preferences = (GameHubApi.Contracts.Preference)resource.Preferences
             };
         }
     }
