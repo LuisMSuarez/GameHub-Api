@@ -8,6 +8,15 @@ namespace GameHubApi.Repository.Contracts
         [JsonProperty("id")]
         public required string Id { get; set; }
 
+        [JsonProperty("slug")]
+        public required string Slug { get; set; }
+
+        [JsonProperty("name")]
+        public required string Name { get; set; }
+
+        [JsonProperty("background_image")]
+        public string? BackgroundImage { get; set; }
+
         [JsonProperty("userId")]
         public required string UserId { get; set; }
 
