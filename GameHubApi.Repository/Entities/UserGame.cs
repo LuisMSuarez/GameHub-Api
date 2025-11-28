@@ -5,6 +5,9 @@ namespace GameHubApi.Repository.Contracts
 {
     internal class UserGame
     {
+        [JsonProperty("id")]
+        public required string Id { get; set; }
+
         [JsonProperty("userId")]
         public required string UserId { get; set; }
 

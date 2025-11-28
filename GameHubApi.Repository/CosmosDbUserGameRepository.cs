@@ -97,6 +97,7 @@ namespace GameHubApi.Repository
         {
             return new GameHubApi.Contracts.UserGame
             {
+                Id = resource.Id,
                 GameId = resource.GameId,
                 UserId = resource.UserId,
                 Preferences = (GameHubApi.Contracts.Preference)resource.Preferences
