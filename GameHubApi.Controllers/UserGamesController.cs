@@ -1,5 +1,6 @@
 ﻿namespace GameHubApi.Controllers
 {
+    using GameHubApi.Contracts;
     using GameHubApi.Services;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,22 @@
             var userId = User.GetObjectId();
             var result = await this.userGameService.GetUserGames(userId);
             return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUserGame([FromRoute] string id, [FromBody] UserGame userGame)
+        {
+            this.logger.LogInformation("UpdateUserGame called for id {Id}.", id);
+            var userId = User.GetObjectId();
+
+            var updated = await this.userGameService.UpdateUserGame(id, userId, userGame);
+            if (updated == null)
+            {
+                this.logger.LogWarning("Failed to update UserGame with id {Id} for user {UserId}.", id, userId);
+                return NotFound();
+            }
+
+            return Ok(updated);
         }
     }
 }

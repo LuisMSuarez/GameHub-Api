@@ -24,6 +24,16 @@
         /// <summary>
         /// Indicates that an unexpected error occurred within the data access layer.
         /// </summary>
-        InternalServerError
+        InternalServerError,
+
+        /// <summary>
+        /// Indicates that the resource was not found within the data access layer.
+        /// </summary>
+        NotFound,
+
+        /// <summary>
+        /// Indicates that a forbidden error ocurrend within the data access layer.
+        /// </summary>
+        Forbidden
     }
 }
