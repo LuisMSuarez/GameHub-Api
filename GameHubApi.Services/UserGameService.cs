@@ -1,5 +1,7 @@
 ﻿using GameHubApi.Contracts;
 using GameHubApi.Repository;
+using GameHubApi.Repository.Contracts;
+using GameHubApi.Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,21 @@ namespace GameHubApi.Services
         public Task<UserGame?> GetUserGame(string id, string userId)
         {
             return this.repository.GetUserGame(id, userId);
+        }
+
+        public Task<UserGame> UpdateUserGame(string id, string userId, UserGame userGame)
+        {
+            if (!string.Equals(userGame.Id, id, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ServiceException(ServiceResultCode.BadRequest, "UserGame Id does not match the provided id.");
+            }
+
+            if (!string.Equals(userGame.UserId, userId, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ServiceException(ServiceResultCode.BadRequest, "UserGame UserId does not match the provided userId.");
+            }
+
+            return this.repository.UpdateUserGame(id, userId, userGame);
         }
 
         public Task<CollectionResult<UserGame>> GetUserGames(string userId)
