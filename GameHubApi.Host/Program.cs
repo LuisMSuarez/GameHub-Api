@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
                 "http://localhost:5174",
                 "https://gamers-hub.azurewebsites.net",
                 "https://gamers-hub-cnt.azurewebsites.net") // allowed origins
-            .WithMethods("GET", "POST")
+            .WithMethods("GET", "POST", "PUT")
             .AllowAnyHeader();
     });
 });
