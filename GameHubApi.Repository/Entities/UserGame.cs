@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GameHubApi.Repository.Contracts
+namespace GameHubApi.Repository.Entities
 {
     internal class UserGame
     {

@@ -2,28 +2,48 @@
 using GameHubApi.Repository;
 using GameHubApi.Repository.Contracts;
 using GameHubApi.Services.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameHubApi.Services
 {
     public class UserGameService : IUserGameService
     {
         private readonly IUserGameRepository repository;
+
         public UserGameService(IUserGameRepository repository)
         {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public Task<UserGame?> GetUserGame(string id, string userId)
+        public async Task<UserGame?> GetUserGame(string id, string userId)
         {
-            return this.repository.GetUserGame(id, userId);
+            try
+            {
+                return await this.repository.GetUserGame(id, userId);
+            }
+            catch (RepositoryException ex)
+            {
+                throw new ServiceException(MapResultCode(ex.ResultCode), ex.Message, ex);
+            }
         }
 
-        public Task<UserGame> UpdateUserGame(string id, string userId, UserGame userGame)
+        public async Task<UserGame> CreateUserGame(string userId, UserGame userGame)
+        {
+            if (!string.Equals(userGame.UserId, userId, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ServiceException(ServiceResultCode.BadRequest, "UserGame UserId does not match the provided userId.");
+            }
+
+            try
+            {
+                return await this.repository.CreateUserGame(userId, userGame);
+            }
+            catch (RepositoryException ex)
+            {
+                throw new ServiceException(MapResultCode(ex.ResultCode), ex.Message, ex);
+            }
+        }
+
+        public async Task<UserGame> UpdateUserGame(string id, string userId, UserGame userGame)
         {
             if (!string.Equals(userGame.Id, id, StringComparison.OrdinalIgnoreCase))
             {
@@ -35,17 +55,42 @@ namespace GameHubApi.Services
                 throw new ServiceException(ServiceResultCode.BadRequest, "UserGame UserId does not match the provided userId.");
             }
 
-            return this.repository.UpdateUserGame(id, userId, userGame);
+            try
+            {
+                return await this.repository.UpdateUserGame(id, userId, userGame);
+            }
+            catch (RepositoryException ex)
+            {
+                throw new ServiceException(MapResultCode(ex.ResultCode), ex.Message, ex);
+            }
         }
 
-        public Task<CollectionResult<UserGame>> GetUserGames(string userId)
+        public async Task<CollectionResult<UserGame>> GetUserGames(string userId)
         {
-            return this.repository.GetUserGames(userId);
+            try
+            {
+                return await this.repository.GetUserGames(userId);
+            }
+            catch (RepositoryException ex)
+            {
+                throw new ServiceException(MapResultCode(ex.ResultCode), ex.Message, ex);
+            }
         }
 
-        public Task<UserGame> CreateOrUpdateUserGamePreference(string userid, string gameId, Preference preference)
+        /// <summary>
+        /// Maps repository result codes to service result codes.
+        /// </summary>
+        private static ServiceResultCode MapResultCode(RepositoryResultCode repoCode)
         {
-            return this.repository.CreateOrUpdateUserGamePreference(userid, gameId, preference);
+            return repoCode switch
+            {
+                RepositoryResultCode.BadRequest => ServiceResultCode.BadRequest,
+                RepositoryResultCode.NotFound => ServiceResultCode.NotFound,
+                RepositoryResultCode.Conflict => ServiceResultCode.Conflict,
+                RepositoryResultCode.Forbidden => ServiceResultCode.Forbidden,
+                RepositoryResultCode.InternalServerError => ServiceResultCode.InternalServerError,
+                _ => ServiceResultCode.InternalServerError
+            };
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace GameHubApi.Repository.Contracts
+﻿namespace GameHubApi.Repository.Entities
 {
     [Flags]
     internal enum Preference

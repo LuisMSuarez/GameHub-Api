@@ -5,7 +5,7 @@ namespace GameHubApi.Contracts
     public class UserGame
     {
         [JsonPropertyName("id")]
-        public required string Id { get; set; }
+        public string? Id { get; set; }
 
         [JsonPropertyName("slug")]
         public required string Slug { get; set; }

@@ -8,39 +8,25 @@ namespace GameHubApi.Repository
 {
     public class CosmosDbUserGameRepository : IUserGameRepository
     {
-        private readonly CosmosClient client;
         private readonly Container container;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbUrlShortcutRepository"/> class.
-        /// </summary>
-        /// <param name="client">The Cosmos DB client instance.</param>
-        /// <param name="configurationOptions">Configuration options containing database and container names.</param>
-        public CosmosDbUserGameRepository(
-            CosmosClient client,
-            IConfiguration configuration)
+        public CosmosDbUserGameRepository(CosmosClient client, IConfiguration configuration)
         {
-            this.client = client ?? throw new ArgumentNullException(nameof(client));
+            ArgumentNullException.ThrowIfNull(client, nameof(client));
             ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
+
             var database = client.GetDatabase(configuration["CosmosDbDatabase"]);
             this.container = database.GetContainer("userGames");
         }
 
-        public async Task<GameHubApi.Contracts.UserGame?> GetUserGame(string id, string userId)
+        public async Task<UserGame?> GetUserGame(string id, string userId)
         {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                throw new RepositoryException(RepositoryResultCode.BadRequest, "Id is null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserId is null or empty.");
-            }
+            ValidateId(id);
+            ValidateUserId(userId);
 
             try
             {
-                var response = await this.container.ReadItemAsync<GameHubApi.Repository.Contracts.UserGame>(id, new PartitionKey(userId));
+                var response = await this.container.ReadItemAsync<Entities.UserGame>(id, new PartitionKey(userId));
                 return ToUserGameContract(response.Resource);
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -49,29 +35,49 @@ namespace GameHubApi.Repository
             }
             catch (Exception ex)
             {
-                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error fetching url shortcut.", ex);
+                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error fetching user game.", ex);
             }
         }
 
-        public async Task<GameHubApi.Contracts.UserGame> UpdateUserGame(
-            string id,
-            string userId,
-            GameHubApi.Contracts.UserGame userGame)
+        public async Task<UserGame> CreateUserGame(string userId, UserGame userGame)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            ValidateUserId(userId);
+            ArgumentNullException.ThrowIfNull(userGame, nameof(userGame));
+
+            if (userGame.Id != null)
             {
-                throw new RepositoryException(RepositoryResultCode.BadRequest, "Id is null or empty.");
+                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserGame Id must not be provided on create.");
             }
 
-            if (string.IsNullOrWhiteSpace(userId))
+            if (!string.Equals(userGame.UserId, userId, StringComparison.OrdinalIgnoreCase))
             {
-                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserId is null or empty.");
+                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserGame UserId does not match the provided userId.");
             }
 
-            if (userGame == null)
+            try
             {
-                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserGame is null.");
+                userGame.Id = Guid.NewGuid().ToString();
+                var repoEntity = ToUserGameRepository(userGame);
+
+                var response = await this.container.CreateItemAsync(repoEntity, new PartitionKey(userId));
+                return ToUserGameContract(response.Resource);
             }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.Conflict)
+            {
+                throw new RepositoryException(RepositoryResultCode.Conflict,
+                    $"UserGame for GameId {userGame.GameId} could not be created for user {userId}.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error creating user game.", ex);
+            }
+        }
+
+        public async Task<UserGame> UpdateUserGame(string id, string userId, UserGame userGame)
+        {
+            ValidateId(id);
+            ValidateUserId(userId);
+            ArgumentNullException.ThrowIfNull(userGame, nameof(userGame));
 
             if (!string.Equals(userGame.Id, id, StringComparison.OrdinalIgnoreCase))
             {
@@ -85,111 +91,94 @@ namespace GameHubApi.Repository
 
             try
             {
-                // First, read the existing item to verify ownership
-                var existing = await this.container.ReadItemAsync<GameHubApi.Repository.Contracts.UserGame>(
-                    id,
-                    new PartitionKey(userId));
+                var existing = await this.container.ReadItemAsync<Entities.UserGame>(id, new PartitionKey(userId));
 
                 if (!string.Equals(existing.Resource.UserId, userId, StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new RepositoryException(
-                        RepositoryResultCode.Forbidden,
+                    throw new RepositoryException(RepositoryResultCode.Forbidden,
                         $"UserGame with id {id} is not owned by user {userId}.");
-                }
 
-                // Map contract to repository entity
                 var repoEntity = ToUserGameRepository(userGame);
-
-                // Replace the existing item
-                var response = await this.container.ReplaceItemAsync(
-                    repoEntity,
-                    id,
-                    new PartitionKey(userId));
+                var response = await this.container.ReplaceItemAsync(repoEntity, id, new PartitionKey(userId));
 
                 return ToUserGameContract(response.Resource);
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new RepositoryException(
-                    RepositoryResultCode.NotFound,
-                    $"UserGame with id {id} not found for user {userId}.",
-                    ex);
+                throw new RepositoryException(RepositoryResultCode.NotFound,
+                    $"UserGame with id {id} not found for user {userId}.", ex);
             }
             catch (Exception ex)
             {
-                throw new RepositoryException(
-                    RepositoryResultCode.InternalServerError,
-                    "Error updating user game.",
-                    ex);
+                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error updating user game.", ex);
             }
         }
 
-        public async Task<CollectionResult<GameHubApi.Contracts.UserGame>> GetUserGames(string userId)
+        public async Task<CollectionResult<UserGame>> GetUserGames(string userId)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserId is null or empty.");
-            }
+            ValidateUserId(userId);
 
             try
             {
                 var query = new QueryDefinition("SELECT * FROM c");
                 var options = new QueryRequestOptions { PartitionKey = new PartitionKey(userId) };
 
-                var response = await this.container.GetItemQueryIterator<GameHubApi.Repository.Contracts.UserGame>(
-                    query, requestOptions: options).ReadNextAsync();
+                var iterator = this.container.GetItemQueryIterator<Entities.UserGame>(query, requestOptions: options);
+                var results = new List<UserGame>();
 
-                var results = response.Resource.ToList().Select( r => ToUserGameContract(r));
-                return new CollectionResult<GameHubApi.Contracts.UserGame>
+                while (iterator.HasMoreResults)
                 {
-                    Count = results.Count(),
-                    Results = results.ToList()
-                };
-            }
-            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-            {
-                return new CollectionResult<GameHubApi.Contracts.UserGame>
+                    var response = await iterator.ReadNextAsync();
+                    results.AddRange(response.Resource.Select(ToUserGameContract));
+                }
+
+                return new CollectionResult<UserGame>
                 {
-                    Count = 0
+                    Count = results.Count,
+                    Results = results
                 };
             }
             catch (Exception ex)
             {
-                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error fetching url shortcut.", ex);
+                throw new RepositoryException(RepositoryResultCode.InternalServerError, "Error fetching user games.", ex);
             }
         }
 
-        public Task<GameHubApi.Contracts.UserGame> CreateOrUpdateUserGamePreference(string userId, string gameId, GameHubApi.Contracts.Preference preference)
+        private static void ValidateId(string id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new RepositoryException(RepositoryResultCode.BadRequest, "Id is null or empty.");
+            }
         }
 
-        private GameHubApi.Contracts.UserGame ToUserGameContract(Contracts.UserGame resource)
+        private static void ValidateUserId(string userId)
         {
-            return new GameHubApi.Contracts.UserGame
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                Id = resource.Id,
-                Slug = resource.Slug,
-                Name = resource.Name,
-                BackgroundImage = resource.BackgroundImage,
-                GameId = resource.GameId,
-                UserId = resource.UserId,
-                Preferences = (GameHubApi.Contracts.Preference)resource.Preferences
-            };
+                throw new RepositoryException(RepositoryResultCode.BadRequest, "UserId is null or empty.");
+            }
         }
 
-        private Contracts.UserGame ToUserGameRepository(GameHubApi.Contracts.UserGame contract)
+        private static UserGame ToUserGameContract(Entities.UserGame resource) => new UserGame
         {
-            return new Contracts.UserGame
-            {
-                Id = contract.Id,
-                Slug = contract.Slug,
-                Name = contract.Name,
-                BackgroundImage = contract.BackgroundImage,
-                GameId = contract.GameId,
-                UserId = contract.UserId,
-                Preferences = (Contracts.Preference)contract.Preferences
-            };
-        }
+            Id = resource.Id,
+            Slug = resource.Slug,
+            Name = resource.Name,
+            BackgroundImage = resource.BackgroundImage,
+            GameId = resource.GameId,
+            UserId = resource.UserId,
+            Preferences = (Preference)resource.Preferences
+        };
+
+        private static Entities.UserGame ToUserGameRepository(UserGame contract) => new Entities.UserGame
+        {
+            Id = contract.Id!,
+            Slug = contract.Slug,
+            Name = contract.Name,
+            BackgroundImage = contract.BackgroundImage,
+            GameId = contract.GameId,
+            UserId = contract.UserId,
+            Preferences = (Entities.Preference)contract.Preferences
+        };
     }
 }
